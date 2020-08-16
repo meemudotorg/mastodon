@@ -4,7 +4,6 @@
 This is the mastodon code for [meemu dot org](https://meemu.org).
 
 
-
 ## License
 
 Copyright (C) 2016-2020 Eugen Rochko & other Mastodon contributors (see [AUTHORS.md](AUTHORS.md))
