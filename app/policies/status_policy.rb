@@ -12,6 +12,9 @@ class StatusPolicy < ApplicationPolicy
   end
 
   def show?
+    return false if author.suspended?
+    return false if local_only? && (current_account.nil? || !current_account.local?)
+
     if requires_mention?
       owned? || mention_exists?
     elsif private?
@@ -89,5 +92,9 @@ class StatusPolicy < ApplicationPolicy
 
   def author
     record.account
+  end
+  
+  def local_only?
+    record.local_only?
   end
 end

@@ -28,6 +28,8 @@ class StatusesController < ApplicationController
   def show
     respond_to do |format|
       format.html do
+        use_pack 'public'
+
         expires_in 10.seconds, public: true if current_account.nil?
         set_ancestors
         set_descendants
@@ -46,6 +48,7 @@ class StatusesController < ApplicationController
   end
 
   def embed
+    use_pack 'embed'
     return not_found if @status.hidden? || @status.reblog?
 
     expires_in 180, public: true

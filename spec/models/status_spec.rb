@@ -203,6 +203,43 @@ RSpec.describe Status, type: :model do
     end
   end
 
+  describe 'on create' do
+    let(:local_account) { Fabricate(:account, username: 'local', domain: nil) }
+    let(:remote_account) { Fabricate(:account, username: 'remote', domain: 'example.com') }
+
+    subject { Status.new }
+
+    describe 'on a status that ends with the local-only emoji' do
+      before do
+        subject.text = 'A toot ' + subject.local_only_emoji
+      end
+
+      context 'if the status originates from this instance' do
+        before do
+          subject.account = local_account
+        end
+
+        it 'is marked local-only' do
+          subject.save!
+
+          expect(subject).to be_local_only
+        end
+      end
+
+      context 'if the status is remote' do
+        before do
+          subject.account = remote_account
+        end
+
+        it 'is not marked local-only' do
+          subject.save!
+
+          expect(subject).to_not be_local_only
+        end
+      end
+    end
+  end
+
   describe '.mutes_map' do
     let(:status)  { Fabricate(:status) }
     let(:account) { Fabricate(:account) }
@@ -267,238 +304,53 @@ RSpec.describe Status, type: :model do
     end
   end
 
-  describe '.as_public_timeline' do
-    it 'only includes statuses with public visibility' do
-      public_status = Fabricate(:status, visibility: :public)
-      private_status = Fabricate(:status, visibility: :private)
+  describe '.as_direct_timeline' do
+    let(:account) { Fabricate(:account) }
+    let(:followed) { Fabricate(:account) }
+    let(:not_followed) { Fabricate(:account) }
 
-      results = Status.as_public_timeline
-      expect(results).to include(public_status)
-      expect(results).not_to include(private_status)
+    before do
+      Fabricate(:follow, account: account, target_account: followed)
+
+      @self_public_status = Fabricate(:status, account: account, visibility: :public)
+      @self_direct_status = Fabricate(:status, account: account, visibility: :direct)
+      @followed_public_status = Fabricate(:status, account: followed, visibility: :public)
+      @followed_direct_status = Fabricate(:status, account: followed, visibility: :direct)
+      @not_followed_direct_status = Fabricate(:status, account: not_followed, visibility: :direct)
+
+      @results = Status.as_direct_timeline(account)
     end
 
-    it 'does not include replies' do
-      status = Fabricate(:status)
-      reply = Fabricate(:status, in_reply_to_id: status.id)
-
-      results = Status.as_public_timeline
-      expect(results).to include(status)
-      expect(results).not_to include(reply)
+    it 'does not include public statuses from self' do
+      expect(@results).to_not include(@self_public_status)
     end
 
-    it 'does not include boosts' do
-      status = Fabricate(:status)
-      boost = Fabricate(:status, reblog_of_id: status.id)
-
-      results = Status.as_public_timeline
-      expect(results).to include(status)
-      expect(results).not_to include(boost)
+    it 'includes direct statuses from self' do
+      expect(@results).to include(@self_direct_status)
     end
 
-    it 'filters out silenced accounts' do
-      account = Fabricate(:account)
-      silenced_account = Fabricate(:account, silenced: true)
-      status = Fabricate(:status, account: account)
-      silenced_status = Fabricate(:status, account: silenced_account)
-
-      results = Status.as_public_timeline
-      expect(results).to include(status)
-      expect(results).not_to include(silenced_status)
+    it 'does not include public statuses from followed' do
+      expect(@results).to_not include(@followed_public_status)
     end
 
-    context 'without local_only option' do
-      let(:viewer) { nil }
-
-      let!(:local_account)  { Fabricate(:account, domain: nil) }
-      let!(:remote_account) { Fabricate(:account, domain: 'test.com') }
-      let!(:local_status)   { Fabricate(:status, account: local_account) }
-      let!(:remote_status)  { Fabricate(:status, account: remote_account) }
-
-      subject { Status.as_public_timeline(viewer, false) }
-
-      context 'without a viewer' do
-        let(:viewer) { nil }
-
-        it 'includes remote instances statuses' do
-          expect(subject).to include(remote_status)
-        end
-
-        it 'includes local statuses' do
-          expect(subject).to include(local_status)
-        end
-      end
-
-      context 'with a viewer' do
-        let(:viewer) { Fabricate(:account, username: 'viewer') }
-
-        it 'includes remote instances statuses' do
-          expect(subject).to include(remote_status)
-        end
-
-        it 'includes local statuses' do
-          expect(subject).to include(local_status)
-        end
-      end
+    it 'does not include direct statuses not mentioning recipient from followed' do
+      expect(@results).to_not include(@followed_direct_status)
     end
 
-    context 'with a local_only option set' do
-      let!(:local_account)  { Fabricate(:account, domain: nil) }
-      let!(:remote_account) { Fabricate(:account, domain: 'test.com') }
-      let!(:local_status)   { Fabricate(:status, account: local_account) }
-      let!(:remote_status)  { Fabricate(:status, account: remote_account) }
-
-      subject { Status.as_public_timeline(viewer, true) }
-
-      context 'without a viewer' do
-        let(:viewer) { nil }
-
-        it 'does not include remote instances statuses' do
-          expect(subject).to include(local_status)
-          expect(subject).not_to include(remote_status)
-        end
-      end
-
-      context 'with a viewer' do
-        let(:viewer) { Fabricate(:account, username: 'viewer') }
-
-        it 'does not include remote instances statuses' do
-          expect(subject).to include(local_status)
-          expect(subject).not_to include(remote_status)
-        end
-
-        it 'is not affected by personal domain blocks' do
-          viewer.block_domain!('test.com')
-          expect(subject).to include(local_status)
-          expect(subject).not_to include(remote_status)
-        end
-      end
+    it 'does not include direct statuses not mentioning recipient from non-followed' do
+      expect(@results).to_not include(@not_followed_direct_status)
     end
 
-    context 'with a remote_only option set' do
-      let!(:local_account)  { Fabricate(:account, domain: nil) }
-      let!(:remote_account) { Fabricate(:account, domain: 'test.com') }
-      let!(:local_status)   { Fabricate(:status, account: local_account) }
-      let!(:remote_status)  { Fabricate(:status, account: remote_account) }
-
-      subject { Status.as_public_timeline(viewer, :remote) }
-
-      context 'without a viewer' do
-        let(:viewer) { nil }
-
-        it 'does not include local instances statuses' do
-          expect(subject).not_to include(local_status)
-          expect(subject).to include(remote_status)
-        end
-      end
-
-      context 'with a viewer' do
-        let(:viewer) { Fabricate(:account, username: 'viewer') }
-
-        it 'does not include local instances statuses' do
-          expect(subject).not_to include(local_status)
-          expect(subject).to include(remote_status)
-        end
-      end
+    it 'includes direct statuses mentioning recipient from followed' do
+      Fabricate(:mention, account: account, status: @followed_direct_status)
+      results2 = Status.as_direct_timeline(account)
+      expect(results2).to include(@followed_direct_status)
     end
 
-    describe 'with an account passed in' do
-      before do
-        @account = Fabricate(:account)
-      end
-
-      it 'excludes statuses from accounts blocked by the account' do
-        blocked = Fabricate(:account)
-        Fabricate(:block, account: @account, target_account: blocked)
-        blocked_status = Fabricate(:status, account: blocked)
-
-        results = Status.as_public_timeline(@account)
-        expect(results).not_to include(blocked_status)
-      end
-
-      it 'excludes statuses from accounts who have blocked the account' do
-        blocked = Fabricate(:account)
-        Fabricate(:block, account: blocked, target_account: @account)
-        blocked_status = Fabricate(:status, account: blocked)
-
-        results = Status.as_public_timeline(@account)
-        expect(results).not_to include(blocked_status)
-      end
-
-      it 'excludes statuses from accounts muted by the account' do
-        muted = Fabricate(:account)
-        Fabricate(:mute, account: @account, target_account: muted)
-        muted_status = Fabricate(:status, account: muted)
-
-        results = Status.as_public_timeline(@account)
-        expect(results).not_to include(muted_status)
-      end
-
-      it 'excludes statuses from accounts from personally blocked domains' do
-        blocked = Fabricate(:account, domain: 'example.com')
-        @account.block_domain!(blocked.domain)
-        blocked_status = Fabricate(:status, account: blocked)
-
-        results = Status.as_public_timeline(@account)
-        expect(results).not_to include(blocked_status)
-      end
-
-      context 'with language preferences' do
-        it 'excludes statuses in languages not allowed by the account user' do
-          user = Fabricate(:user, chosen_languages: [:en, :es])
-          @account.update(user: user)
-          en_status = Fabricate(:status, language: 'en')
-          es_status = Fabricate(:status, language: 'es')
-          fr_status = Fabricate(:status, language: 'fr')
-
-          results = Status.as_public_timeline(@account)
-          expect(results).to include(en_status)
-          expect(results).to include(es_status)
-          expect(results).not_to include(fr_status)
-        end
-
-        it 'includes all languages when user does not have a setting' do
-          user = Fabricate(:user, chosen_languages: nil)
-          @account.update(user: user)
-
-          en_status = Fabricate(:status, language: 'en')
-          es_status = Fabricate(:status, language: 'es')
-
-          results = Status.as_public_timeline(@account)
-          expect(results).to include(en_status)
-          expect(results).to include(es_status)
-        end
-
-        it 'includes all languages when account does not have a user' do
-          expect(@account.user).to be_nil
-          en_status = Fabricate(:status, language: 'en')
-          es_status = Fabricate(:status, language: 'es')
-
-          results = Status.as_public_timeline(@account)
-          expect(results).to include(en_status)
-          expect(results).to include(es_status)
-        end
-      end
-    end
-  end
-
-  describe '.as_tag_timeline' do
-    it 'includes statuses with a tag' do
-      tag = Fabricate(:tag)
-      status = Fabricate(:status, tags: [tag])
-      other = Fabricate(:status)
-
-      results = Status.as_tag_timeline(tag)
-      expect(results).to include(status)
-      expect(results).not_to include(other)
-    end
-
-    it 'allows replies to be included' do
-      original = Fabricate(:status)
-      tag = Fabricate(:tag)
-      status = Fabricate(:status, tags: [tag], in_reply_to_id: original.id)
-
-      results = Status.as_tag_timeline(tag)
-      expect(results).to include(status)
+    it 'includes direct statuses mentioning recipient from non-followed' do
+      Fabricate(:mention, account: account, status: @not_followed_direct_status)
+      results2 = Status.as_direct_timeline(account)
+      expect(results2).to include(@not_followed_direct_status)
     end
   end
 

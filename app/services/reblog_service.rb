@@ -31,7 +31,7 @@ class ReblogService < BaseService
     reblog = account.statuses.create!(reblog: reblogged_status, text: '', visibility: visibility, rate_limit: options[:with_rate_limit])
 
     DistributionWorker.perform_async(reblog.id)
-    ActivityPub::DistributionWorker.perform_async(reblog.id)
+    ActivityPub::DistributionWorker.perform_async(reblog.id) unless reblogged_status.local_only?
 
     create_notification(reblog)
     bump_potential_friendship(account, reblog)
@@ -45,7 +45,7 @@ class ReblogService < BaseService
     reblogged_status = reblog.reblog
 
     if reblogged_status.account.local?
-      LocalNotificationWorker.perform_async(reblogged_status.account_id, reblog.id, reblog.class.name)
+      LocalNotificationWorker.perform_async(reblogged_status.account_id, reblog.id, reblog.class.name, :reblog)
     elsif reblogged_status.account.activitypub? && !reblogged_status.account.following?(reblog.account)
       ActivityPub::DeliveryWorker.perform_async(build_json(reblog), reblog.account_id, reblogged_status.account.inbox_url)
     end

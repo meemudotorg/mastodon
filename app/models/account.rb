@@ -66,6 +66,10 @@ class Account < ApplicationRecord
   include AccountCounters
   include DomainNormalizable
 
+  MAX_DISPLAY_NAME_LENGTH = (ENV['MAX_DISPLAY_NAME_CHARS'] || 30).to_i
+  MAX_NOTE_LENGTH = (ENV['MAX_BIO_CHARS'] || 500).to_i
+  MAX_FIELDS = (ENV['MAX_PROFILE_FIELDS'] || 4).to_i
+
   TRUST_LEVELS = {
     untrusted: 0,
     trusted: 1,
@@ -82,9 +86,9 @@ class Account < ApplicationRecord
   # Local user validations
   validates :username, format: { with: /\A[a-z0-9_]+\z/i }, length: { maximum: 30 }, if: -> { local? && will_save_change_to_username? && actor_type != 'Application' }
   validates_with UnreservedUsernameValidator, if: -> { local? && will_save_change_to_username? }
-  validates :display_name, length: { maximum: 30 }, if: -> { local? && will_save_change_to_display_name? }
-  validates :note, note_length: { maximum: 500 }, if: -> { local? && will_save_change_to_note? }
-  validates :fields, length: { maximum: 4 }, if: -> { local? && will_save_change_to_fields? }
+  validates :display_name, length: { maximum: MAX_DISPLAY_NAME_LENGTH }, if: -> { local? && will_save_change_to_display_name? }
+  validates :note, note_length: { maximum: MAX_NOTE_LENGTH }, if: -> { local? && will_save_change_to_note? }
+  validates :fields, length: { maximum: MAX_FIELDS }, if: -> { local? && will_save_change_to_fields? }
 
   scope :remote, -> { where.not(domain: nil) }
   scope :local, -> { where(domain: nil) }
@@ -222,23 +226,20 @@ class Account < ApplicationRecord
 
   def suspend!(date = Time.now.utc)
     transaction do
-      user&.disable! if local?
+      create_deletion_request!
       update!(suspended_at: date)
     end
   end
 
   def unsuspend!
     transaction do
-      user&.enable! if local?
+      deletion_request&.destroy!
       update!(suspended_at: nil)
     end
   end
 
   def memorialize!
-    transaction do
-      user&.disable! if local?
-      update!(memorial: true)
-    end
+    update!(memorial: true)
   end
 
   def sign?
@@ -303,15 +304,13 @@ class Account < ApplicationRecord
     self[:fields] = fields
   end
 
-  DEFAULT_FIELDS_SIZE = 4
-
   def build_fields
-    return if fields.size >= DEFAULT_FIELDS_SIZE
+    return if fields.size >= MAX_FIELDS
 
     tmp = self[:fields] || []
     tmp = [] if tmp.is_a?(Hash)
 
-    (DEFAULT_FIELDS_SIZE - tmp.size).times do
+    (MAX_FIELDS - tmp.size).times do
       tmp << { name: '', value: '' }
     end
 

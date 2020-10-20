@@ -29,6 +29,7 @@ class RemoveStatusService < BaseService
         remove_from_hashtags
         remove_from_public
         remove_from_media if status.media_attachments.any?
+        remove_from_direct if status.direct_visibility?
         remove_from_spam_check
         remove_media
 
@@ -53,6 +54,7 @@ class RemoveStatusService < BaseService
 
   def remove_from_self
     FeedManager.instance.unpush_from_home(@account, @status)
+    FeedManager.instance.unpush_from_direct(@account, @status) if @status.direct_visibility?
   end
 
   def remove_from_followers
@@ -155,6 +157,12 @@ class RemoveStatusService < BaseService
       redis.publish('timeline:public:local:media', @payload)
     else
       redis.publish('timeline:public:remote:media', @payload)
+    end
+  end
+
+  def remove_from_direct
+    @mentions.each do |mention|
+      FeedManager.instance.unpush_from_direct(mention.account, @status) if mention.account.local?
     end
   end
 

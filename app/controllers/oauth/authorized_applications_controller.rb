@@ -5,6 +5,8 @@ class Oauth::AuthorizedApplicationsController < Doorkeeper::AuthorizedApplicatio
 
   before_action :store_current_location
   before_action :authenticate_resource_owner!
+  before_action :set_pack
+  before_action :require_not_suspended!, only: :destroy
   before_action :set_body_classes
 
   skip_before_action :require_functional!
@@ -24,5 +26,13 @@ class Oauth::AuthorizedApplicationsController < Doorkeeper::AuthorizedApplicatio
 
   def store_current_location
     store_location_for(:user, request.url)
+  end
+
+  def set_pack
+    use_pack 'settings'
+  end
+
+  def require_not_suspended!
+    forbidden if current_account.suspended?
   end
 end

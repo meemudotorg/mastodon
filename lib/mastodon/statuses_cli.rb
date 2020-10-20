@@ -50,7 +50,7 @@ module Mastodon
       # Skip statuses favourited by local users
       scope = scope.where('id NOT IN (SELECT favourites.status_id FROM favourites WHERE statuses.id = favourites.status_id AND favourites.account_id IN (SELECT accounts.id FROM accounts WHERE domain IS NULL))')
       # Skip statuses bookmarked by local users
-      scope = scope.where('id NOT IN (SELECT bookmarks.status_id FROM bookmarks WHERE statuses.id = bookmarks.status_id AND bookmarks.account_id IN (SELECT accounts.id FROM accounts WHERE domain IS NULL))')
+      scope = scope.where('id NOT IN (SELECT bookmarks.status_id FROM bookmarks WHERE statuses.id = bookmarks.status_id)')
 
       unless options[:clean_followed]
         # Skip accounts followed by local accounts

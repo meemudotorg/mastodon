@@ -8,6 +8,8 @@ class Auth::SessionsController < Devise::SessionsController
   skip_before_action :require_no_authentication, only: [:create]
   skip_before_action :require_functional!
 
+  prepend_before_action :set_pack
+
   include TwoFactorAuthenticationConcern
   include SignInTokenAuthenticationConcern
 
@@ -37,6 +39,22 @@ class Auth::SessionsController < Devise::SessionsController
     store_location_for(:user, tmp_stored_location) if continue_after?
   end
 
+  def webauthn_options
+    user = find_user
+
+    if user.webauthn_enabled?
+      options_for_get = WebAuthn::Credential.options_for_get(
+        allow: user.webauthn_credentials.pluck(:external_id)
+      )
+
+      session[:webauthn_challenge] = options_for_get.challenge
+
+      render json: options_for_get, status: :ok
+    else
+      render json: { error: t('webauthn_credentials.not_enabled') }, status: :unauthorized
+    end
+  end
+
   protected
 
   def find_user
@@ -51,7 +69,7 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :otp_attempt, :sign_in_token_attempt)
+    params.require(:user).permit(:email, :password, :otp_attempt, :sign_in_token_attempt, credential: {})
   end
 
   def after_sign_in_path_for(resource)
@@ -80,6 +98,10 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   private
+
+  def set_pack
+    use_pack 'auth'
+  end
 
   def set_instance_presenter
     @instance_presenter = InstancePresenter.new

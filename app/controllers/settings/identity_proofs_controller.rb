@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class Settings::IdentityProofsController < Settings::BaseController
-  layout 'admin'
-
-  before_action :authenticate_user!
   before_action :check_required_params, only: :new
+  before_action :check_enabled, only: :new
 
   def index
     @proofs = AccountIdentityProof.where(account: current_account).order(provider: :asc, provider_username: :asc)
@@ -44,6 +42,10 @@ class Settings::IdentityProofsController < Settings::BaseController
   end
 
   private
+
+  def check_enabled
+    not_found unless Setting.enable_keybase
+  end
 
   def check_required_params
     redirect_to settings_identity_proofs_path unless [:provider, :provider_username, :username, :token].all? { |k| params[k].present? }

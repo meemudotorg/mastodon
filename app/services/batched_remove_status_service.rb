@@ -40,6 +40,7 @@ class BatchedRemoveStatusService < BaseService
     # Cannot be batched
     statuses.each do |status|
       unpush_from_public_timelines(status)
+      unpush_from_direct_timelines(status) if status.direct_visibility?
     end
   end
 
@@ -90,6 +91,16 @@ class BatchedRemoveStatusService < BaseService
         redis.publish("timeline:hashtag:#{hashtag.mb_chars.downcase}", payload)
         redis.publish("timeline:hashtag:#{hashtag.mb_chars.downcase}:local", payload) if status.local?
       end
+    end
+  end
+
+  def unpush_from_direct_timelines(status)
+    payload = @json_payloads[status.id]
+    redis.pipelined do
+      @mentions[status.id].each do |mention|
+        FeedManager.instance.unpush_from_direct(mention.account, status) if mention.account.local?
+      end
+      FeedManager.instance.unpush_from_direct(status.account, status) if status.account.local?
     end
   end
 end

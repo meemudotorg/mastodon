@@ -3,6 +3,8 @@
 class HomeController < ApplicationController
   before_action :redirect_unauthenticated_to_permalinks!
   before_action :authenticate_user!
+
+  before_action :set_pack
   before_action :set_referrer_policy_header
 
   def index
@@ -38,6 +40,10 @@ class HomeController < ApplicationController
     matches = request.path.match(%r{\A/web/timelines/tag/(?<tag>.+)\z})
 
     redirect_to(matches ? tag_path(CGI.unescape(matches[:tag])) : default_redirect_path)
+  end
+
+  def set_pack
+    use_pack 'home'
   end
 
   def default_redirect_path

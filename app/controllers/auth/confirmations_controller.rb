@@ -4,6 +4,7 @@ class Auth::ConfirmationsController < Devise::ConfirmationsController
   layout 'auth'
 
   before_action :set_body_classes
+  before_action :set_pack
   before_action :require_unconfirmed!
 
   skip_before_action :require_functional!
@@ -15,6 +16,10 @@ class Auth::ConfirmationsController < Devise::ConfirmationsController
   end
 
   private
+
+  def set_pack
+    use_pack 'auth'
+  end
 
   def require_unconfirmed!
     redirect_to edit_user_registration_path if user_signed_in? && current_user.confirmed? && current_user.unconfirmed_email.blank?

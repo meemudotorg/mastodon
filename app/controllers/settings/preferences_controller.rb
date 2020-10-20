@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Settings::PreferencesController < Settings::BaseController
-  layout 'admin'
-
-  before_action :authenticate_user!
-
   def show; end
 
   def update
@@ -42,18 +38,21 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_default_language,
       :setting_unfollow_modal,
       :setting_boost_modal,
+      :setting_favourite_modal,
       :setting_delete_modal,
       :setting_auto_play_gif,
       :setting_display_media,
       :setting_expand_spoilers,
       :setting_reduce_motion,
       :setting_system_font_ui,
+      :setting_system_emoji_font,
       :setting_noindex,
-      :setting_theme,
       :setting_hide_network,
+      :setting_hide_followers_count,
       :setting_aggregate_reblogs,
       :setting_show_application,
       :setting_advanced_layout,
+      :setting_default_content_type,
       :setting_use_blurhash,
       :setting_use_pending_items,
       :setting_trends,

@@ -59,6 +59,7 @@ ignore_unused:
   - 'errors.429'
   - 'admin.accounts.roles.*'
   - 'admin.action_logs.actions.*'
+  - 'themes.*'
   - 'statuses.attached.*'
   - 'move_handler.carry_{mutes,blocks}_over_text'
 

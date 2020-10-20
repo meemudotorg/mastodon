@@ -13,6 +13,7 @@ class FollowingAccountsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
+        use_pack 'public'
         expires_in 0, public: true unless user_signed_in?
 
         next if @account.user_hides_network?

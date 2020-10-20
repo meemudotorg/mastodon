@@ -421,7 +421,7 @@
         "id": "status.reblog"
       },
       {
-        "defaultMessage": "Boost to original audience",
+        "defaultMessage": "Boost with original visibility",
         "id": "status.reblog_private"
       },
       {
@@ -2421,7 +2421,7 @@
         "id": "status.reblog"
       },
       {
-        "defaultMessage": "Boost to original audience",
+        "defaultMessage": "Boost with original visibility",
         "id": "status.reblog_private"
       },
       {
@@ -2681,6 +2681,19 @@
       }
     ],
     "path": "app/javascript/mastodon/features/ui/components/boost_modal.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Favourite",
+        "id": "status.favourite"
+      },
+      {
+        "defaultMessage": "You can press {combo} to skip this next time",
+        "id": "favourite_modal.combo"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/favourite_modal.json"
   },
   {
     "descriptors": [

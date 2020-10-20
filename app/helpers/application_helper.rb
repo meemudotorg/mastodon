@@ -111,7 +111,8 @@ module ApplicationHelper
 
   def body_classes
     output = (@body_classes || '').split(' ')
-    output << "theme-#{current_theme.parameterize}"
+    output << "flavour-#{current_flavour.parameterize}"
+    output << "skin-#{current_skin.parameterize}"
     output << 'system-font' if current_account&.user&.setting_system_font_ui
     output << (current_account&.user&.setting_reduce_motion ? 'reduce-motion' : 'no-reduce-motion')
     output << 'rtl' if locale_direction == 'rtl'
@@ -162,6 +163,8 @@ module ApplicationHelper
     end
 
     json = ActiveModelSerializers::SerializableResource.new(InitialStatePresenter.new(state_params), serializer: InitialStateSerializer).to_json
+    # rubocop:disable Rails/OutputSafety
     content_tag(:script, json_escape(json).html_safe, id: 'initial-state', type: 'application/json')
+    # rubocop:enable Rails/OutputSafety
   end
 end
