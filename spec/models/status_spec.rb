@@ -284,6 +284,41 @@ RSpec.describe Status do
     end
   end
 
+  describe '#ordered_media_attachments' do
+    let(:status) { Fabricate(:status) }
+
+    let(:first_attachment) { Fabricate(:media_attachment) }
+    let(:second_attachment) { Fabricate(:media_attachment) }
+    let(:last_attachment) { Fabricate(:media_attachment) }
+    let(:extra_attachment) { Fabricate(:media_attachment) }
+
+    before do
+      stub_const('Status::MEDIA_ATTACHMENTS_LIMIT', 3)
+
+      # Add attachments out of order
+      status.media_attachments << second_attachment
+      status.media_attachments << last_attachment
+      status.media_attachments << extra_attachment
+      status.media_attachments << first_attachment
+    end
+
+    context 'when ordered_media_attachment_ids is not set' do
+      it 'returns up to MEDIA_ATTACHMENTS_LIMIT attachments' do
+        expect(status.ordered_media_attachments.size).to eq Status::MEDIA_ATTACHMENTS_LIMIT
+      end
+    end
+
+    context 'when ordered_media_attachment_ids is set' do
+      before do
+        status.update!(ordered_media_attachment_ids: [first_attachment.id, second_attachment.id, last_attachment.id, extra_attachment.id])
+      end
+
+      it 'returns up to MEDIA_ATTACHMENTS_LIMIT attachments in the expected order' do
+        expect(status.ordered_media_attachments).to eq [first_attachment, second_attachment, last_attachment]
+      end
+    end
+  end
+
   describe '.mutes_map' do
     subject { described_class.mutes_map([status.conversation.id], account) }
 
@@ -524,11 +559,53 @@ RSpec.describe Status do
     end
   end
 
-  describe 'validation' do
-    it 'disallow empty uri for remote status' do
-      alice.update(domain: 'example.com')
-      status = Fabricate.build(:status, uri: '', account: alice)
-      expect(status).to model_have_error_on_field(:uri)
+  describe 'Validations' do
+    context 'with a remote account' do
+      subject { Fabricate.build :status, account: remote_account }
+
+      let(:remote_account) { Fabricate :account, domain: 'example.com' }
+
+      it { is_expected.to_not allow_value('').for(:uri) }
+    end
+  end
+
+  describe 'Callbacks' do
+    describe 'Stripping content when required' do
+      context 'with a remote account' do
+        subject { Fabricate.build :status, local: false, account:, text: '   text   ', spoiler_text: '   spoiler   ' }
+
+        let(:account) { Fabricate.build :account, domain: 'host.example' }
+
+        it 'preserves content' do
+          expect { subject.valid? }
+            .to not_change(subject, :text)
+            .and not_change(subject, :spoiler_text)
+        end
+      end
+
+      context 'with a local account' do
+        let(:account) { Fabricate.build :account, domain: nil }
+
+        context 'with populated fields' do
+          subject { Fabricate.build :status, local: true, account:, text: '   text   ', spoiler_text: '   spoiler   ' }
+
+          it 'strips content' do
+            expect { subject.valid? }
+              .to change(subject, :text).to('text')
+              .and change(subject, :spoiler_text).to('spoiler')
+          end
+        end
+
+        context 'with empty fields' do
+          subject { Fabricate.build :status, local: true, account:, text: nil, spoiler_text: nil }
+
+          it 'preserves content' do
+            expect { subject.valid? }
+              .to not_change(subject, :text)
+              .and not_change(subject, :spoiler_text)
+          end
+        end
+      end
     end
   end
 
