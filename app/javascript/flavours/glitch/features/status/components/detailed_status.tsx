@@ -19,7 +19,6 @@ import { getHashtagBarForStatus } from 'flavours/glitch/components/hashtag_bar';
 import { IconLogo } from 'flavours/glitch/components/logo';
 import { Permalink } from 'flavours/glitch/components/permalink';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
-import { useAppHistory } from 'flavours/glitch/components/router';
 import { VisibilityIcon } from 'flavours/glitch/components/visibility_icon';
 import PollContainer from 'flavours/glitch/containers/poll_container';
 import { useAppSelector } from 'flavours/glitch/store';
@@ -51,6 +50,7 @@ export const DetailedStatus: React.FC<{
   domain: string;
   showMedia?: boolean;
   withLogo?: boolean;
+  overrideDisplayName?: React.ReactNode;
   pictureInPicture: any;
   onToggleHidden?: (status: any) => void;
   onToggleMediaVisibility?: () => void;
@@ -65,6 +65,7 @@ export const DetailedStatus: React.FC<{
   domain,
   showMedia,
   withLogo,
+  overrideDisplayName,
   pictureInPicture,
   onToggleMediaVisibility,
   onToggleHidden,
@@ -73,7 +74,6 @@ export const DetailedStatus: React.FC<{
   const properStatus = status?.get('reblog') ?? status;
   const [height, setHeight] = useState(0);
   const nodeRef = useRef<HTMLDivElement>();
-  const history = useAppHistory();
 
   const rewriteMentions = useAppSelector(
     (state) => state.local_settings.get('rewrite_mentions', false) as boolean,
@@ -140,18 +140,6 @@ export const DetailedStatus: React.FC<{
     if (onTranslate) onTranslate(status);
   }, [onTranslate, status]);
 
-  const parseClick = useCallback(
-    (e: React.MouseEvent, destination: string) => {
-      if (e.button === 0 && !(e.ctrlKey || e.altKey || e.metaKey)) {
-        e.preventDefault();
-        history.push(destination);
-      }
-
-      e.stopPropagation();
-    },
-    [history],
-  );
-
   if (!properStatus) {
     return null;
   }
@@ -196,7 +184,7 @@ export const DetailedStatus: React.FC<{
     ) {
       media.push(<AttachmentList media={status.get('media_attachments')} />);
     } else if (
-      ['image', 'gifv'].includes(
+      ['image', 'gifv', 'unknown'].includes(
         status.getIn(['media_attachments', 0, 'type']) as string,
       ) ||
       status.get('media_attachments').size > 1
@@ -289,6 +277,7 @@ export const DetailedStatus: React.FC<{
       <PollContainer
         pollId={status.get('poll')}
         // @ts-expect-error -- Poll/PollContainer is not typed yet
+        status={status}
         lang={status.get('language')}
       />,
     );
@@ -377,7 +366,11 @@ export const DetailedStatus: React.FC<{
           <div className='detailed-status__display-avatar'>
             <Avatar account={status.get('account')} size={46} />
           </div>
-          <DisplayName account={status.get('account')} localDomain={domain} />
+
+          {overrideDisplayName ?? (
+            <DisplayName account={status.get('account')} localDomain={domain} />
+          )}
+
           {withLogo && (
             <>
               <div className='spacer' />
@@ -398,8 +391,6 @@ export const DetailedStatus: React.FC<{
           onUpdate={handleChildUpdate}
           tagLinks={tagMisleadingLinks}
           rewriteMentions={rewriteMentions}
-          parseClick={parseClick}
-          disabled
           {...(statusContentProps as any)}
         />
 
