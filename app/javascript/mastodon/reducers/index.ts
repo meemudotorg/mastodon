@@ -17,7 +17,9 @@ import filters from './filters';
 import followed_tags from './followed_tags';
 import height_cache from './height_cache';
 import history from './history';
-import { listsReducer } from './lists';
+import listAdder from './list_adder';
+import listEditor from './list_editor';
+import lists from './lists';
 import { markersReducer } from './markers';
 import media_attachments from './media_attachments';
 import meta from './meta';
@@ -27,15 +29,16 @@ import { notificationPolicyReducer } from './notification_policy';
 import { notificationRequestsReducer } from './notification_requests';
 import notifications from './notifications';
 import { pictureInPictureReducer } from './picture_in_picture';
-import { pollsReducer } from './polls';
+import polls from './polls';
 import push_notifications from './push_notifications';
 import { relationshipsReducer } from './relationships';
-import { searchReducer } from './search';
+import search from './search';
 import server from './server';
 import settings from './settings';
 import status_lists from './status_lists';
 import statuses from './statuses';
-import { suggestionsReducer } from './suggestions';
+import suggestions from './suggestions';
+import tags from './tags';
 import timelines from './timelines';
 import trends from './trends';
 import user_lists from './user_lists';
@@ -60,21 +63,24 @@ const reducers = {
   server,
   contexts,
   compose,
-  search: searchReducer,
+  search,
   media_attachments,
   notifications,
   notificationGroups: notificationGroupsReducer,
   height_cache,
   custom_emojis,
-  lists: listsReducer,
+  lists,
+  listEditor,
+  listAdder,
   filters,
   conversations,
-  suggestions: suggestionsReducer,
-  polls: pollsReducer,
+  suggestions,
+  polls,
   trends,
   markers: markersReducer,
   picture_in_picture: pictureInPictureReducer,
   history,
+  tags,
   followed_tags,
   notificationPolicy: notificationPolicyReducer,
   notificationRequests: notificationRequestsReducer,

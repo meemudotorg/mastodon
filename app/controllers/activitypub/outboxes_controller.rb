@@ -41,11 +41,11 @@ class ActivityPub::OutboxesController < ActivityPub::BaseController
     end
   end
 
-  def outbox_url(**)
+  def outbox_url(**kwargs)
     if params[:account_username].present?
-      account_outbox_url(@account, **)
+      account_outbox_url(@account, **kwargs)
     else
-      instance_actor_outbox_url(**)
+      instance_actor_outbox_url(**kwargs)
     end
   end
 

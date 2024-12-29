@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet';
 import { withRouter } from 'react-router-dom';
 
 import { createSelector } from '@reduxjs/toolkit';
-import { List as ImmutableList } from 'immutable';
+import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { connect } from 'react-redux';
@@ -87,7 +87,7 @@ const makeMapStateToProps = () => {
     (_, { id }) => id,
     state => state.getIn(['contexts', 'inReplyTos']),
   ], (statusId, inReplyTos) => {
-    let ancestorsIds = ImmutableList();
+    let ancestorsIds = Immutable.List();
     ancestorsIds = ancestorsIds.withMutations(mutable => {
       let id = statusId;
 
@@ -134,14 +134,14 @@ const makeMapStateToProps = () => {
       });
     }
 
-    return ImmutableList(descendantsIds);
+    return Immutable.List(descendantsIds);
   });
 
   const mapStateToProps = (state, props) => {
     const status = getStatus(state, { id: props.params.statusId });
 
-    let ancestorsIds   = ImmutableList();
-    let descendantsIds = ImmutableList();
+    let ancestorsIds   = Immutable.List();
+    let descendantsIds = Immutable.List();
 
     if (status) {
       ancestorsIds   = getAncestorsIds(state, { id: status.get('in_reply_to_id') });

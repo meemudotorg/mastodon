@@ -5,12 +5,13 @@ require 'rails_helper'
 RSpec.describe AccountStatusesCleanupPolicy do
   let(:account) { Fabricate(:account, username: 'alice', domain: nil) }
 
-  describe 'Validations' do
-    subject { Fabricate.build :account_statuses_cleanup_policy }
-
-    let(:remote_account) { Fabricate(:account, domain: 'example.com') }
-
-    it { is_expected.to_not allow_value(remote_account).for(:account) }
+  describe 'validation' do
+    it 'disallow remote accounts' do
+      account.update(domain: 'example.com')
+      account_statuses_cleanup_policy = Fabricate.build(:account_statuses_cleanup_policy, account: account)
+      account_statuses_cleanup_policy.valid?
+      expect(account_statuses_cleanup_policy).to model_have_error_on_field(:account)
+    end
   end
 
   describe 'save hooks' do
@@ -129,8 +130,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
     let(:account_statuses_cleanup_policy) { Fabricate(:account_statuses_cleanup_policy, account: account) }
 
     it 'records the given id' do
-      expect { account_statuses_cleanup_policy.record_last_inspected(42) }
-        .to change(account_statuses_cleanup_policy, :last_inspected).from(nil).to(42)
+      account_statuses_cleanup_policy.record_last_inspected(42)
+      expect(account_statuses_cleanup_policy.last_inspected).to eq 42
     end
   end
 
@@ -153,8 +154,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'does not change the recorded id' do
-          expect { subject }
-            .to_not change(account_statuses_cleanup_policy, :last_inspected).from(42)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 42
         end
       end
 
@@ -164,8 +165,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'records the older id' do
-          expect { subject }
-            .to change(account_statuses_cleanup_policy, :last_inspected).from(42).to(10)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 10
         end
       end
     end
@@ -179,8 +180,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'does not change the recorded id' do
-          expect { subject }
-            .to_not change(account_statuses_cleanup_policy, :last_inspected).from(42)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 42
         end
       end
 
@@ -190,8 +191,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'records the older id' do
-          expect { subject }
-            .to change(account_statuses_cleanup_policy, :last_inspected).from(42).to(10)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 10
         end
       end
     end
@@ -205,8 +206,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'does not change the recorded id' do
-          expect { subject }
-            .to_not change(account_statuses_cleanup_policy, :last_inspected).from(42)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 42
         end
       end
 
@@ -216,8 +217,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
         end
 
         it 'records the older id' do
-          expect { subject }
-            .to change(account_statuses_cleanup_policy, :last_inspected).from(42).to(10)
+          subject
+          expect(account_statuses_cleanup_policy.last_inspected).to eq 10
         end
       end
     end
@@ -227,8 +228,8 @@ RSpec.describe AccountStatusesCleanupPolicy do
       let(:status) { Fabricate(:status, account: account) }
 
       it 'does not change the recorded id' do
-        expect { subject }
-          .to_not change(account_statuses_cleanup_policy, :last_inspected).from(42)
+        subject
+        expect(account_statuses_cleanup_policy.last_inspected).to eq 42
       end
     end
   end
@@ -338,7 +339,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep DMs and reject everything else' do
-      before { establish_policy(keep_direct: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = true
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status except does not return the old direct message for deletion' do
         expect(subject.pluck(:id))
@@ -348,7 +356,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep self-bookmarked toots and reject everything else' do
-      before { establish_policy(keep_self_bookmark: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = true
+      end
 
       it 'returns every old status but does not return the old self-bookmarked message for deletion' do
         expect(subject.pluck(:id))
@@ -358,7 +373,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep self-faved toots and reject everything else' do
-      before { establish_policy(keep_self_fav: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = true
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status but does not return the old self-faved message for deletion' do
         expect(subject.pluck(:id))
@@ -368,7 +390,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep toots with media and reject everything else' do
-      before { establish_policy(keep_media: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = true
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status but does not return the old message with media for deletion' do
         expect(subject.pluck(:id))
@@ -378,7 +407,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep toots with polls and reject everything else' do
-      before { establish_policy(keep_polls: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = true
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status but does not return the old poll message for deletion' do
         expect(subject.pluck(:id))
@@ -388,7 +424,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep pinned toots and reject everything else' do
-      before { establish_policy(keep_pinned: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = true
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status but does not return the old pinned message for deletion' do
         expect(subject.pluck(:id))
@@ -398,7 +441,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is to not keep any special messages' do
-      before { establish_policy }
+      before do
+        account_statuses_cleanup_policy.keep_direct = false
+        account_statuses_cleanup_policy.keep_pinned = false
+        account_statuses_cleanup_policy.keep_polls = false
+        account_statuses_cleanup_policy.keep_media = false
+        account_statuses_cleanup_policy.keep_self_fav = false
+        account_statuses_cleanup_policy.keep_self_bookmark = false
+      end
 
       it 'returns every old status but does not return the recent or unrelated statuses' do
         expect(subject.pluck(:id))
@@ -409,7 +459,14 @@ RSpec.describe AccountStatusesCleanupPolicy do
     end
 
     context 'when policy is set to keep every category of toots' do
-      before { establish_policy(keep_direct: true, keep_pinned: true, keep_polls: true, keep_media: true, keep_self_fav: true, keep_self_bookmark: true) }
+      before do
+        account_statuses_cleanup_policy.keep_direct = true
+        account_statuses_cleanup_policy.keep_pinned = true
+        account_statuses_cleanup_policy.keep_polls = true
+        account_statuses_cleanup_policy.keep_media = true
+        account_statuses_cleanup_policy.keep_self_fav = true
+        account_statuses_cleanup_policy.keep_self_bookmark = true
+      end
 
       it 'returns normal statuses and does not return unrelated old status' do
         expect(subject.pluck(:id))
@@ -444,25 +501,6 @@ RSpec.describe AccountStatusesCleanupPolicy do
           .and not_include(unrelated_status.id)
           .and include(very_old_status.id, faved_primary.id, reblogged_primary.id, reblogged_secondary.id)
       end
-    end
-
-    private
-
-    def establish_policy(options = {})
-      default_policy_options.merge(options).each do |attribute, value|
-        account_statuses_cleanup_policy.send :"#{attribute}=", value
-      end
-    end
-
-    def default_policy_options
-      {
-        keep_direct: false,
-        keep_media: false,
-        keep_pinned: false,
-        keep_polls: false,
-        keep_self_bookmark: false,
-        keep_self_fav: false,
-      }
     end
   end
 end

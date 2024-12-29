@@ -7,7 +7,9 @@ RSpec.describe AccountRefreshWorker do
   let(:service) { instance_double(ResolveAccountService, call: true) }
 
   describe '#perform' do
-    before { stub_service }
+    before do
+      allow(ResolveAccountService).to receive(:new).and_return(service)
+    end
 
     context 'when account does not exist' do
       it 'returns immediately without processing' do
@@ -45,12 +47,6 @@ RSpec.describe AccountRefreshWorker do
       def outdated_webfinger_at
         (Account::BACKGROUND_REFRESH_INTERVAL + 3.days).ago
       end
-    end
-
-    def stub_service
-      allow(ResolveAccountService)
-        .to receive(:new)
-        .and_return(service)
     end
   end
 end

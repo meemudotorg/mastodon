@@ -30,7 +30,7 @@ module Status::SnapshotConcern
     )
   end
 
-  def snapshot!(**)
-    build_snapshot(**).save!
+  def snapshot!(**options)
+    build_snapshot(**options).save!
   end
 end

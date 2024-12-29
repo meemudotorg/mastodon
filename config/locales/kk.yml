@@ -285,6 +285,7 @@ kk:
       media:
         title: Медиa
       no_status_selected: Бірде-бір статус өзгерген жоқ, себебі ештеңе таңдалмады
+      title: Аккаунт статустары
       with_media: Медиамен
     tags:
       review: Статусты көрсету
@@ -575,6 +576,7 @@ kk:
   scheduled_statuses:
     over_daily_limit: Сіз бір күндік %{limit} жазба лимитін тауыстыңыз
     over_total_limit: Сіз %{limit} жазба лимитін тауыстыңыз
+    too_soon: Жоспарланған күн болашақта болуы керек
   sessions:
     activity: Соңғы әрекеттер
     browser: Браузер

@@ -26,7 +26,6 @@ import {
   unmuteStatus,
   deleteStatus,
   toggleStatusSpoilers,
-  toggleStatusCollapse,
   editStatus,
   translateStatus,
   undoStatusTranslation,
@@ -191,11 +190,6 @@ const mapDispatchToProps = (dispatch, { contextType }) => ({
   onToggleHidden (status) {
     dispatch(toggleStatusSpoilers(status.get('id')));
   },
-
-  onToggleCollapsed (status, isCollapsed) {
-    dispatch(toggleStatusCollapse(status.get('id'), isCollapsed));
-  },
-
 
   deployPictureInPicture (status, type, mediaProps) {
     dispatch((_, getState) => {

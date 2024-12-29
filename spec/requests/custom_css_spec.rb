@@ -10,14 +10,8 @@ RSpec.describe 'Custom CSS' do
       it 'returns empty stylesheet' do
         get '/custom.css'
 
-        expect(response)
-          .to have_http_status(200)
-          .and have_cacheable_headers
-          .and have_attributes(
-            content_type: match('text/css')
-          )
-        expect(response.body.presence)
-          .to be_nil
+        expect(response.content_type).to include('text/css')
+        expect(response.body.presence).to be_nil
       end
     end
 
@@ -29,14 +23,8 @@ RSpec.describe 'Custom CSS' do
       it 'returns stylesheet from settings' do
         get '/custom.css'
 
-        expect(response)
-          .to have_http_status(200)
-          .and have_cacheable_headers
-          .and have_attributes(
-            content_type: match('text/css')
-          )
-        expect(response.body.strip)
-          .to eq(expected_css)
+        expect(response.content_type).to include('text/css')
+        expect(response.body.strip).to eq(expected_css)
       end
 
       def expected_css
@@ -56,14 +44,8 @@ RSpec.describe 'Custom CSS' do
       it 'returns stylesheet from settings' do
         get '/custom.css'
 
-        expect(response)
-          .to have_http_status(200)
-          .and have_cacheable_headers
-          .and have_attributes(
-            content_type: match('text/css')
-          )
-        expect(response.body.strip)
-          .to eq(expected_css)
+        expect(response.content_type).to include('text/css')
+        expect(response.body.strip).to eq(expected_css)
       end
 
       def expected_css

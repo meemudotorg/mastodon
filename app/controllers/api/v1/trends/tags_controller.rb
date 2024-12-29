@@ -27,9 +27,7 @@ class Api::V1::Trends::TagsController < Api::BaseController
   end
 
   def tags_from_trends
-    scope = Trends.tags.query.allowed.in_locale(content_locale)
-    scope = scope.filtered_for(current_account) if user_signed_in?
-    scope
+    Trends.tags.query.allowed
   end
 
   def next_path

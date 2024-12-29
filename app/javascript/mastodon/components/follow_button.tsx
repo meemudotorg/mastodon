@@ -88,7 +88,7 @@ export const FollowButton: React.FC<{
       <a
         href='/settings/profile'
         target='_blank'
-        rel='noopener'
+        rel='noreferrer noopener'
         className='button button-secondary'
       >
         {label}
@@ -99,12 +99,7 @@ export const FollowButton: React.FC<{
   return (
     <Button
       onClick={handleClick}
-      disabled={
-        relationship?.blocked_by ||
-        relationship?.blocking ||
-        (!(relationship?.following || relationship?.requested) &&
-          (account?.suspended || !!account?.moved))
-      }
+      disabled={relationship?.blocked_by || relationship?.blocking}
       secondary={following}
       className={following ? 'button--destructive' : undefined}
     >

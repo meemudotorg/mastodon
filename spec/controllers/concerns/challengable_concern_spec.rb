@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ChallengableConcern do
   controller(ApplicationController) do
-    include ChallengableConcern # rubocop:disable RSpec/DescribedClass
+    include ChallengableConcern
 
     before_action :require_challenge!
 

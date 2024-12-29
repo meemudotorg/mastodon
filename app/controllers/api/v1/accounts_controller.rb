@@ -106,8 +106,8 @@ class Api::V1::AccountsController < Api::BaseController
     render json: { error: I18n.t('accounts.self_follow_error') }, status: 403 if current_user.account.id == @account.id
   end
 
-  def relationships(**)
-    AccountRelationshipsPresenter.new([@account], current_user.account_id, **)
+  def relationships(**options)
+    AccountRelationshipsPresenter.new([@account], current_user.account_id, **options)
   end
 
   def account_ids

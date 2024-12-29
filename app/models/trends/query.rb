@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 class Trends::Query
+  include Redisable
   include Enumerable
 
-  attr_reader :klass, :loaded
+  attr_reader :prefix, :klass, :loaded
 
   alias loaded? loaded
 
-  def initialize(_prefix, klass)
+  def initialize(prefix, klass)
+    @prefix  = prefix
     @klass   = klass
     @records = []
     @loaded  = false
     @allowed = false
-    @account = nil
     @limit   = nil
     @offset  = nil
   end
@@ -24,15 +25,6 @@ class Trends::Query
 
   def allowed
     clone.allowed!
-  end
-
-  def filtered_for!(account)
-    @account = account
-    self
-  end
-
-  def filtered_for(account)
-    clone.filtered_for!(account)
   end
 
   def in_locale!(value)
@@ -76,10 +68,21 @@ class Trends::Query
   alias to_a to_ary
 
   def to_arel
-    raise NotImplementedError
+    if ids_for_key.empty?
+      klass.none
+    else
+      scope = klass.joins(sanitized_join_sql).reorder('x.ordering')
+      scope = scope.offset(@offset) if @offset.present?
+      scope = scope.limit(@limit) if @limit.present?
+      scope
+    end
   end
 
   private
+
+  def key
+    [@prefix, @allowed ? 'allowed' : 'all', @locale].compact.join(':')
+  end
 
   def load
     unless loaded?
@@ -90,15 +93,29 @@ class Trends::Query
     self
   end
 
-  def perform_queries
-    to_arel.to_a
+  def ids_for_key
+    @ids_for_key ||= redis.zrevrange(key, 0, -1).map(&:to_i)
   end
 
-  def preferred_languages
-    if @account&.chosen_languages.present?
-      @account.chosen_languages
-    else
-      @locale
-    end
+  def sanitized_join_sql
+    ActiveRecord::Base.sanitize_sql_array(join_sql_array)
+  end
+
+  def join_sql_array
+    [join_sql_query, ids_for_key]
+  end
+
+  def join_sql_query
+    <<~SQL.squish
+      JOIN unnest(array[?]) WITH ordinality AS x (id, ordering) ON #{klass.table_name}.id = x.id
+    SQL
+  end
+
+  def perform_queries
+    apply_scopes(to_arel).to_a
+  end
+
+  def apply_scopes(scope)
+    scope
   end
 end

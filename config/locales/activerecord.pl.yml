@@ -39,11 +39,6 @@ pl:
           attributes:
             data:
               malformed: jest uszkodzona
-        list_account:
-          attributes:
-            account_id:
-              taken: jest już na liście
-          must_be_following: musi być obserwowanym kontem
         status:
           attributes:
             reblog:

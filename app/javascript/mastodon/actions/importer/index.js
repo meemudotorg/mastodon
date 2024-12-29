@@ -1,12 +1,10 @@
-import { createPollFromServerJSON } from 'mastodon/models/poll';
-
 import { importAccounts } from '../accounts_typed';
 
-import { normalizeStatus } from './normalizer';
-import { importPolls } from './polls';
+import { normalizeStatus, normalizePoll } from './normalizer';
 
 export const STATUS_IMPORT   = 'STATUS_IMPORT';
 export const STATUSES_IMPORT = 'STATUSES_IMPORT';
+export const POLLS_IMPORT    = 'POLLS_IMPORT';
 export const FILTERS_IMPORT  = 'FILTERS_IMPORT';
 
 function pushUnique(array, object) {
@@ -25,6 +23,10 @@ export function importStatuses(statuses) {
 
 export function importFilters(filters) {
   return { type: FILTERS_IMPORT, filters };
+}
+
+export function importPolls(polls) {
+  return { type: POLLS_IMPORT, polls };
 }
 
 export function importFetchedAccount(account) {
@@ -71,7 +73,7 @@ export function importFetchedStatuses(statuses) {
       }
 
       if (status.poll?.id) {
-        pushUnique(polls, createPollFromServerJSON(status.poll, getState().polls.get(status.poll.id)));
+        pushUnique(polls, normalizePoll(status.poll, getState().getIn(['polls', status.poll.id])));
       }
 
       if (status.card) {
@@ -81,9 +83,15 @@ export function importFetchedStatuses(statuses) {
 
     statuses.forEach(processStatus);
 
-    dispatch(importPolls({ polls }));
+    dispatch(importPolls(polls));
     dispatch(importFetchedAccounts(accounts));
     dispatch(importStatuses(normalStatuses));
     dispatch(importFilters(filters));
+  };
+}
+
+export function importFetchedPoll(poll) {
+  return (dispatch, getState) => {
+    dispatch(importPolls([normalizePoll(poll, getState().getIn(['polls', poll.id]))]));
   };
 }

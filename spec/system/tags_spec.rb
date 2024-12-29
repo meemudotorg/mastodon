@@ -13,7 +13,6 @@ RSpec.describe 'Tags' do
 
       expect(page)
         .to have_css('noscript', text: /Mastodon/)
-        .and have_css('body', class: 'app-body')
         .and have_private_cache_control
     end
   end

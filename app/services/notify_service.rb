@@ -3,7 +3,7 @@
 class NotifyService < BaseService
   include Redisable
 
-  # TODO: the severed_relationships and annual_report types probably warrants email notifications
+  # TODO: the severed_relationships type probably warrants email notifications
   NON_EMAIL_TYPES = %i(
     admin.report
     admin.sign_up
@@ -12,7 +12,6 @@ class NotifyService < BaseService
     status
     moderation_warning
     severed_relationships
-    annual_report
   ).freeze
 
   class BaseCondition
@@ -26,7 +25,6 @@ class NotifyService < BaseService
       poll
       update
       account_warning
-      annual_report
     ).freeze
 
     def initialize(notification)
@@ -102,7 +100,7 @@ class NotifyService < BaseService
   class DropCondition < BaseCondition
     def drop?
       blocked   = @recipient.unavailable?
-      blocked ||= from_self? && %i(poll severed_relationships moderation_warning annual_report).exclude?(@notification.type)
+      blocked ||= from_self? && %i(poll severed_relationships moderation_warning).exclude?(@notification.type)
 
       return blocked if message? && from_staff?
 
@@ -134,7 +132,7 @@ class NotifyService < BaseService
     end
 
     def from_staff?
-      @sender.local? && @sender.user.present? && @sender.user_role&.bypass_block?(@recipient.user_role)
+      @sender.local? && @sender.user.present? && @sender.user_role&.overrides?(@recipient.user_role) && @sender.user_role&.highlighted? && @sender.user_role&.can?(*UserRole::Flags::CATEGORIES[:moderation])
     end
 
     def from_self?

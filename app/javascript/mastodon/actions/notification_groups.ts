@@ -141,9 +141,6 @@ export const pollRecentNotifications = createDataLoadingThunk(
 
     return { notifications };
   },
-  {
-    useLoadingBar: false,
-  },
 );
 
 export const processNewNotificationForGroups = createAppAsyncThunk(

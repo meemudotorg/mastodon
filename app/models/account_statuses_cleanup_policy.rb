@@ -130,7 +130,7 @@ class AccountStatusesCleanupPolicy < ApplicationRecord
   end
 
   def without_direct_scope
-    Status.not_direct_visibility
+    Status.where.not(visibility: :direct)
   end
 
   def old_enough_scope(max_id = nil)

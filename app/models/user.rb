@@ -125,7 +125,7 @@ class User < ApplicationRecord
   scope :signed_in_recently, -> { where(current_sign_in_at: ACTIVE_DURATION.ago..) }
   scope :not_signed_in_recently, -> { where(current_sign_in_at: ...ACTIVE_DURATION.ago) }
   scope :matches_email, ->(value) { where(arel_table[:email].matches("#{value}%")) }
-  scope :matches_ip, ->(value) { left_joins(:ips).merge(IpBlock.contained_by(value)).group(users: [:id]) }
+  scope :matches_ip, ->(value) { left_joins(:ips).where('user_ips.ip <<= ?', value).group('users.id') }
 
   before_validation :sanitize_role
   before_create :set_approved
@@ -163,10 +163,6 @@ class User < ApplicationRecord
     else
       super
     end
-  end
-
-  def signed_in_recently?
-    current_sign_in_at.present? && current_sign_in_at >= ACTIVE_DURATION.ago
   end
 
   def confirmed?
@@ -284,15 +280,6 @@ class User < ApplicationRecord
     save!
   end
 
-  def applications_last_used
-    Doorkeeper::AccessToken
-      .where(resource_owner_id: id)
-      .where.not(last_used_at: nil)
-      .group(:application_id)
-      .maximum(:last_used_at)
-      .to_h
-  end
-
   def token_for_app(app)
     return nil if app.nil? || app.owner != self
 
@@ -350,10 +337,10 @@ class User < ApplicationRecord
   end
 
   def revoke_access!
-    Doorkeeper::AccessGrant.by_resource_owner(self).touch_all(:revoked_at)
+    Doorkeeper::AccessGrant.by_resource_owner(self).update_all(revoked_at: Time.now.utc)
 
     Doorkeeper::AccessToken.by_resource_owner(self).in_batches do |batch|
-      batch.touch_all(:revoked_at)
+      batch.update_all(revoked_at: Time.now.utc)
       Web::PushSubscription.where(access_token_id: batch).delete_all
 
       # Revoke each access token for the Streaming API, since `update_all``
@@ -418,8 +405,8 @@ class User < ApplicationRecord
     @pending_devise_notifications ||= []
   end
 
-  def render_and_send_devise_message(notification, *, **)
-    devise_mailer.send(notification, self, *, **).deliver_later
+  def render_and_send_devise_message(notification, *args, **kwargs)
+    devise_mailer.send(notification, self, *args, **kwargs).deliver_later
   end
 
   def set_approved
@@ -457,7 +444,7 @@ class User < ApplicationRecord
   end
 
   def sign_up_from_ip_requires_approval?
-    sign_up_ip.present? && IpBlock.severity_sign_up_requires_approval.containing(sign_up_ip.to_s).exists?
+    sign_up_ip.present? && IpBlock.severity_sign_up_requires_approval.exists?(['ip >>= ?', sign_up_ip.to_s])
   end
 
   def sign_up_email_requires_approval?
@@ -470,7 +457,13 @@ class User < ApplicationRecord
 
     # Doing this conditionally is not very satisfying, but this is consistent
     # with the MX records validations we do and keeps the specs tractable.
-    records = DomainResource.new(domain).mx unless self.class.skip_mx_check?
+    unless self.class.skip_mx_check?
+      Resolv::DNS.open do |dns|
+        dns.timeouts = 5
+
+        records = dns.getresources(domain, Resolv::DNS::Resource::IN::MX).to_a.map { |e| e.exchange.to_s }.compact_blank
+      end
+    end
 
     EmailDomainBlock.requires_approval?(records + [domain], attempt_ip: sign_up_ip)
   end

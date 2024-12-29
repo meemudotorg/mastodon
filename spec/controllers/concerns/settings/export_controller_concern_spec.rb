@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Settings::ExportControllerConcern do
   controller(ApplicationController) do
-    include Settings::ExportControllerConcern # rubocop:disable RSpec/DescribedClass
+    include Settings::ExportControllerConcern
 
     def index
       send_export_file

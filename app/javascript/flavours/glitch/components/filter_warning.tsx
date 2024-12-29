@@ -10,16 +10,13 @@ export const FilterWarning: React.FC<{
   <StatusBanner
     expanded={expanded}
     onClick={onClick}
-    variant={BannerVariant.Filter}
+    variant={BannerVariant.Blue}
   >
     <p>
       <FormattedMessage
         id='filter_warning.matches_filter'
-        defaultMessage='Matches filter “<span>{title}</span>”'
-        values={{
-          title,
-          span: (chunks) => <span className='filter-name'>{chunks}</span>,
-        }}
+        defaultMessage='Matches filter “{title}”'
+        values={{ title }}
       />
     </p>
   </StatusBanner>

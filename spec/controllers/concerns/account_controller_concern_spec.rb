@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe AccountControllerConcern do
   controller(ApplicationController) do
-    include AccountControllerConcern # rubocop:disable RSpec/DescribedClass
+    include AccountControllerConcern
 
     def success
       render plain: @account.username # rubocop:disable RSpec/InstanceVariable

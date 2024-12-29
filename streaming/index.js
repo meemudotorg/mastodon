@@ -101,8 +101,7 @@ const CHANNEL_NAMES = [
 ];
 
 const startServer = async () => {
-  const pgConfig = Database.configFromEnv(process.env, environment);
-  const pgPool = Database.getPool(pgConfig, environment, logger);
+  const pgPool = Database.getPool(Database.configFromEnv(process.env, environment));
 
   const metrics = setupMetrics(CHANNEL_NAMES, pgPool);
 

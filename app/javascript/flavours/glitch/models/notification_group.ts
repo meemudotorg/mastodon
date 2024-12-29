@@ -1,7 +1,6 @@
 import type {
   ApiAccountRelationshipSeveranceEventJSON,
   ApiAccountWarningJSON,
-  ApiAnnualReportEventJSON,
   BaseNotificationGroupJSON,
   ApiNotificationGroupJSON,
   ApiNotificationJSON,
@@ -17,7 +16,6 @@ export const NOTIFICATIONS_GROUP_MAX_AVATARS = 8;
 interface BaseNotificationGroup
   extends Omit<BaseNotificationGroupJSON, 'sample_account_ids'> {
   sampleAccountIds: string[];
-  partial: boolean;
 }
 
 interface BaseNotificationWithStatus<Type extends NotificationWithStatusType>
@@ -67,12 +65,6 @@ export interface NotificationGroupSeveredRelationships
   event: AccountRelationshipSeveranceEvent;
 }
 
-type AnnualReportEvent = ApiAnnualReportEventJSON;
-export interface NotificationGroupAnnualReport
-  extends BaseNotification<'annual_report'> {
-  annualReport: AnnualReportEvent;
-}
-
 interface Report extends Omit<ApiReportJSON, 'target_account'> {
   targetAccountId: string;
 }
@@ -94,8 +86,7 @@ export type NotificationGroup =
   | NotificationGroupModerationWarning
   | NotificationGroupSeveredRelationships
   | NotificationGroupAdminSignUp
-  | NotificationGroupAdminReport
-  | NotificationGroupAnnualReport;
+  | NotificationGroupAdminReport;
 
 function createReportFromJSON(reportJSON: ApiReportJSON): Report {
   const { target_account, ...report } = reportJSON;
@@ -121,12 +112,6 @@ function createAccountRelationshipSeveranceEventFromJSON(
   return eventJson;
 }
 
-function createAnnualReportEventFromJSON(
-  eventJson: ApiAnnualReportEventJSON,
-): AnnualReportEvent {
-  return eventJson;
-}
-
 export function createNotificationGroupFromJSON(
   groupJson: ApiNotificationGroupJSON,
 ): NotificationGroup {
@@ -143,7 +128,6 @@ export function createNotificationGroupFromJSON(
       return {
         statusId: statusId ?? undefined,
         sampleAccountIds,
-        partial: false,
         ...groupWithoutStatus,
       };
     }
@@ -152,39 +136,27 @@ export function createNotificationGroupFromJSON(
       return {
         report: createReportFromJSON(report),
         sampleAccountIds,
-        partial: false,
         ...groupWithoutTargetAccount,
       };
     }
     case 'severed_relationships':
       return {
         ...group,
-        partial: false,
         event: createAccountRelationshipSeveranceEventFromJSON(group.event),
         sampleAccountIds,
       };
+
     case 'moderation_warning': {
       const { moderation_warning, ...groupWithoutModerationWarning } = group;
       return {
         ...groupWithoutModerationWarning,
-        partial: false,
         moderationWarning: createAccountWarningFromJSON(moderation_warning),
-        sampleAccountIds,
-      };
-    }
-    case 'annual_report': {
-      const { annual_report, ...groupWithoutAnnualReport } = group;
-      return {
-        ...groupWithoutAnnualReport,
-        partial: false,
-        annualReport: createAnnualReportEventFromJSON(annual_report),
         sampleAccountIds,
       };
     }
     default:
       return {
         sampleAccountIds,
-        partial: false,
         ...group,
       };
   }
@@ -192,17 +164,17 @@ export function createNotificationGroupFromJSON(
 
 export function createNotificationGroupFromNotificationJSON(
   notification: ApiNotificationJSON,
-): NotificationGroup {
+) {
   const group = {
     sampleAccountIds: [notification.account.id],
     group_key: notification.group_key,
     notifications_count: 1,
+    type: notification.type,
     most_recent_notification_id: notification.id,
     page_min_id: notification.id,
     page_max_id: notification.id,
     latest_page_notification_at: notification.created_at,
-    partial: true,
-  };
+  } as NotificationGroup;
 
   switch (notification.type) {
     case 'favourite':
@@ -211,21 +183,12 @@ export function createNotificationGroupFromNotificationJSON(
     case 'mention':
     case 'poll':
     case 'update':
-      return {
-        ...group,
-        type: notification.type,
-        statusId: notification.status?.id,
-      };
+      return { ...group, statusId: notification.status?.id };
     case 'admin.report':
-      return {
-        ...group,
-        type: notification.type,
-        report: createReportFromJSON(notification.report),
-      };
+      return { ...group, report: createReportFromJSON(notification.report) };
     case 'severed_relationships':
       return {
         ...group,
-        type: notification.type,
         event: createAccountRelationshipSeveranceEventFromJSON(
           notification.event,
         ),
@@ -233,15 +196,11 @@ export function createNotificationGroupFromNotificationJSON(
     case 'moderation_warning':
       return {
         ...group,
-        type: notification.type,
         moderationWarning: createAccountWarningFromJSON(
           notification.moderation_warning,
         ),
       };
     default:
-      return {
-        ...group,
-        type: notification.type,
-      };
+      return group;
   }
 }

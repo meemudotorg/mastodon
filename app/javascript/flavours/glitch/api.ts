@@ -68,7 +68,6 @@ export async function apiRequest<ApiResponse = unknown>(
   method: Method,
   url: string,
   args: {
-    signal?: AbortSignal;
     params?: RequestParamsOrData;
     data?: RequestParamsOrData;
     timeout?: number;

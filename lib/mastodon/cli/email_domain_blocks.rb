@@ -7,13 +7,11 @@ module Mastodon::CLI
   class EmailDomainBlocks < Base
     desc 'list', 'List blocked e-mail domains'
     def list
-      EmailDomainBlock.parents.find_each do |parent|
-        say(parent.domain.to_s, :white)
+      EmailDomainBlock.where(parent_id: nil).find_each do |entry|
+        say(entry.domain.to_s, :white)
 
-        shell.indent do
-          EmailDomainBlock.where(parent_id: parent.id).find_each do |child|
-            say(child.domain, :cyan)
-          end
+        EmailDomainBlock.where(parent_id: entry.id).find_each do |child|
+          say("  #{child.domain}", :cyan)
         end
       end
     end
@@ -45,7 +43,12 @@ module Mastodon::CLI
         end
 
         other_domains = []
-        other_domains = DomainResource.new(domain).mx if options[:with_dns_records]
+        if options[:with_dns_records]
+          Resolv::DNS.open do |dns|
+            dns.timeouts = 5
+            other_domains = dns.getresources(@email_domain_block.domain, Resolv::DNS::Resource::IN::MX).to_a
+          end
+        end
 
         email_domain_block = EmailDomainBlock.new(domain: domain, other_domains: other_domains)
         email_domain_block.save!

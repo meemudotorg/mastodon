@@ -3,15 +3,18 @@
 require 'rails_helper'
 
 RSpec.describe IpBlock do
-  include_examples 'Expireable'
-
-  describe 'Validations' do
-    subject { Fabricate.build :ip_block }
-
+  describe 'validations' do
     it { is_expected.to validate_presence_of(:ip) }
     it { is_expected.to validate_presence_of(:severity) }
 
-    it { is_expected.to validate_uniqueness_of(:ip) }
+    it 'validates ip uniqueness', :aggregate_failures do
+      described_class.create!(ip: '127.0.0.1', severity: :no_access)
+
+      ip_block = described_class.new(ip: '127.0.0.1', severity: :no_access)
+
+      expect(ip_block).to_not be_valid
+      expect(ip_block).to model_have_error_on_field(:ip)
+    end
   end
 
   describe '#to_log_human_identifier' do

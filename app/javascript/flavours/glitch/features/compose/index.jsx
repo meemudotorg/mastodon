@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
+import spring from 'react-motion/lib/spring';
+
 import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
@@ -27,9 +29,11 @@ import elephantUIPlane from '../../../../images/elephant_ui_plane.svg';
 import { changeComposing, mountCompose, unmountCompose } from '../../actions/compose';
 import { mascot } from '../../initial_state';
 import { isMobile } from '../../is_mobile';
+import Motion from '../ui/util/optional_motion';
 
-import { Search } from './components/search';
+import { SearchResults } from './components/search_results';
 import ComposeFormContainer from './containers/compose_form_container';
+import SearchContainer from './containers/search_container';
 
 const messages = defineMessages({
   start: { id: 'getting_started.heading', defaultMessage: 'Getting started' },
@@ -42,8 +46,9 @@ const messages = defineMessages({
   compose: { id: 'navigation_bar.compose', defaultMessage: 'Compose new post' },
 });
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, ownProps) => ({
   columns: state.getIn(['settings', 'columns']),
+  showSearch: ownProps.multiColumn ? state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']) : false,
   unreadNotifications: state.getIn(['notifications', 'unread']),
   showNotificationsBadge: state.getIn(['local_settings', 'notifications', 'tab_badge']),
 });
@@ -59,6 +64,7 @@ class Compose extends PureComponent {
     dispatch: PropTypes.func.isRequired,
     columns: ImmutablePropTypes.list.isRequired,
     multiColumn: PropTypes.bool,
+    showSearch: PropTypes.bool,
     unreadNotifications: PropTypes.number,
     showNotificationsBadge: PropTypes.bool,
     intl: PropTypes.object.isRequired,
@@ -111,7 +117,7 @@ class Compose extends PureComponent {
   };
 
   render () {
-    const { multiColumn, showNotificationsBadge, unreadNotifications, intl } = this.props;
+    const { multiColumn, showSearch, showNotificationsBadge, unreadNotifications, intl } = this.props;
 
     const elefriend = [glitchedElephant1, glitchedElephant2, glitchedElephant3, elephantUIPlane][this.state.elefriend];
 
@@ -151,7 +157,7 @@ class Compose extends PureComponent {
             <a href='/auth/sign_out' className='drawer__tab' title={intl.formatMessage(messages.logout)} aria-label={intl.formatMessage(messages.logout)} onClick={this.handleLogoutClick}><Icon id='sign-out' icon={LogoutIcon} /></a>
           </nav>
 
-          {multiColumn && <Search /> }
+          {multiColumn && <SearchContainer /> }
 
           <div className='drawer__pager'>
             <div className='drawer__inner' onFocus={this.onFocus}>
@@ -162,6 +168,14 @@ class Compose extends PureComponent {
                 <img alt='' draggable='false' src={mascot || elefriend} />
               </div>
             </div>
+
+            <Motion defaultStyle={{ x: -100 }} style={{ x: spring(showSearch ? 0 : -100, { stiffness: 210, damping: 20 }) }}>
+              {({ x }) => (
+                <div className='drawer__inner darker' style={{ transform: `translateX(${x}%)`, visibility: x === -100 ? 'hidden' : 'visible' }}>
+                  <SearchResults />
+                </div>
+              )}
+            </Motion>
           </div>
         </div>
       );

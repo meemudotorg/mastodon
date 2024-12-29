@@ -10,7 +10,7 @@ module Auth::CaptchaConcern
   end
 
   def captcha_available?
-    Rails.configuration.x.captcha.secret_key.present? && Rails.configuration.x.captcha.site_key.present?
+    ENV['HCAPTCHA_SECRET_KEY'].present? && ENV['HCAPTCHA_SITE_KEY'].present?
   end
 
   def captcha_enabled?

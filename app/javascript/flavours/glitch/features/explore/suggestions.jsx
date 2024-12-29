@@ -5,24 +5,25 @@ import { FormattedMessage } from 'react-intl';
 
 import { withRouter } from 'react-router-dom';
 
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
-import { fetchSuggestions } from 'flavours/glitch/actions/suggestions';
+import { fetchSuggestions, dismissSuggestion } from 'flavours/glitch/actions/suggestions';
 import { LoadingIndicator } from 'flavours/glitch/components/loading_indicator';
 import { WithRouterPropTypes } from 'flavours/glitch/utils/react_router';
 
 import { Card } from './components/card';
 
 const mapStateToProps = state => ({
-  suggestions: state.suggestions.items,
-  isLoading: state.suggestions.isLoading,
+  suggestions: state.getIn(['suggestions', 'items']),
+  isLoading: state.getIn(['suggestions', 'isLoading']),
 });
 
 class Suggestions extends PureComponent {
 
   static propTypes = {
     isLoading: PropTypes.bool,
-    suggestions: PropTypes.array,
+    suggestions: ImmutablePropTypes.list,
     dispatch: PropTypes.func.isRequired,
     ...WithRouterPropTypes,
   };
@@ -31,17 +32,22 @@ class Suggestions extends PureComponent {
     const { dispatch, suggestions, history } = this.props;
 
     // If we're navigating back to the screen, do not trigger a reload
-    if (history.action === 'POP' && suggestions.length > 0) {
+    if (history.action === 'POP' && suggestions.size > 0) {
       return;
     }
 
-    dispatch(fetchSuggestions());
+    dispatch(fetchSuggestions(true));
   }
+
+  handleDismiss = (accountId) => {
+    const { dispatch } = this.props;
+    dispatch(dismissSuggestion(accountId));
+  };
 
   render () {
     const { isLoading, suggestions } = this.props;
 
-    if (!isLoading && suggestions.length === 0) {
+    if (!isLoading && suggestions.isEmpty()) {
       return (
         <div className='explore__suggestions scrollable scrollable--flex'>
           <div className='empty-column-indicator'>
@@ -55,9 +61,9 @@ class Suggestions extends PureComponent {
       <div className='explore__suggestions scrollable' data-nosnippet>
         {isLoading ? <LoadingIndicator /> : suggestions.map(suggestion => (
           <Card
-            key={suggestion.account_id}
-            id={suggestion.account_id}
-            source={suggestion.sources[0]}
+            key={suggestion.get('account')}
+            id={suggestion.get('account')}
+            source={suggestion.getIn(['sources', 0])}
           />
         ))}
       </div>

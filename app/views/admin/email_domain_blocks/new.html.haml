@@ -30,12 +30,12 @@
             %label.batch-table__row__select.batch-table__row__select--aligned.batch-checkbox
               = f.input_field :other_domains,
                               as: :boolean,
-                              checked_value: record,
+                              checked_value: record.exchange.to_s,
                               include_hidden: false,
                               multiple: true
             .batch-table__row__content.pending-account
               .pending-account__header
-                %samp= record
+                %samp= record.exchange.to_s
                 %br
                 = t('admin.email_domain_blocks.dns.types.mx')
 

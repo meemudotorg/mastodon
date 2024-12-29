@@ -144,8 +144,8 @@ const mapDispatchToProps = (dispatch) => ({
     }));
   },
 
-  onOpenURL (url) {
-    return dispatch(openURL({ url }));
+  onOpenURL (url, routerHistory, onFailure) {
+    dispatch(openURL(url, routerHistory, onFailure));
   },
 
 });

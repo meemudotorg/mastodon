@@ -80,9 +80,9 @@ module Mastodon::CLI
         end
 
         ip_blocks = if options[:force]
-                      IpBlock.containing(address)
+                      IpBlock.where('ip >>= ?', address)
                     else
-                      IpBlock.contained_by(address)
+                      IpBlock.where('ip <<= ?', address)
                     end
 
         if ip_blocks.empty?

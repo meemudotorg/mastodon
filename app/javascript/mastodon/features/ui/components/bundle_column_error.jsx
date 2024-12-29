@@ -9,7 +9,58 @@ import { Link } from 'react-router-dom';
 
 import { Button } from 'mastodon/components/button';
 import Column from 'mastodon/components/column';
-import { GIF } from 'mastodon/components/gif';
+import { autoPlayGif } from 'mastodon/initial_state';
+
+class GIF extends PureComponent {
+
+  static propTypes = {
+    src: PropTypes.string.isRequired,
+    staticSrc: PropTypes.string.isRequired,
+    className: PropTypes.string,
+    animate: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    animate: autoPlayGif,
+  };
+
+  state = {
+    hovering: false,
+  };
+
+  handleMouseEnter = () => {
+    const { animate } = this.props;
+
+    if (!animate) {
+      this.setState({ hovering: true });
+    }
+  };
+
+  handleMouseLeave = () => {
+    const { animate } = this.props;
+
+    if (!animate) {
+      this.setState({ hovering: false });
+    }
+  };
+
+  render () {
+    const { src, staticSrc, className, animate } = this.props;
+    const { hovering } = this.state;
+
+    return (
+      <img
+        className={className}
+        src={(hovering || animate) ? src : staticSrc}
+        alt=''
+        role='presentation'
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
+      />
+    );
+  }
+
+}
 
 class CopyButton extends PureComponent {
 

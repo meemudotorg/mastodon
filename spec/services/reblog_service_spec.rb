@@ -46,7 +46,7 @@ RSpec.describe ReblogService do
           Status
             .where(id: reblog_of_id)
             .where(text: 'discard-status-text')
-            .touch_all(:deleted_at)
+            .update_all(deleted_at: Time.now.utc)
         end
       end
     end

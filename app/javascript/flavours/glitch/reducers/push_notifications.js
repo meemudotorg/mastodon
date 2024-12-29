@@ -1,11 +1,11 @@
-import { Map as ImmutableMap } from 'immutable';
+import Immutable from 'immutable';
 
 import { SET_BROWSER_SUPPORT, SET_SUBSCRIPTION, CLEAR_SUBSCRIPTION, SET_ALERTS } from '../actions/push_notifications';
 import { STORE_HYDRATE } from '../actions/store';
 
-const initialState = ImmutableMap({
+const initialState = Immutable.Map({
   subscription: null,
-  alerts: ImmutableMap({
+  alerts: new Immutable.Map({
     follow: false,
     follow_request: false,
     favourite: false,
@@ -24,7 +24,7 @@ export default function push_subscriptions(state = initialState, action) {
 
     if (push_subscription) {
       return state
-        .set('subscription', ImmutableMap({
+        .set('subscription', new Immutable.Map({
           id: push_subscription.get('id'),
           endpoint: push_subscription.get('endpoint'),
         }))
@@ -36,11 +36,11 @@ export default function push_subscriptions(state = initialState, action) {
   }
   case SET_SUBSCRIPTION:
     return state
-      .set('subscription', ImmutableMap({
+      .set('subscription', new Immutable.Map({
         id: action.subscription.id,
         endpoint: action.subscription.endpoint,
       }))
-      .set('alerts', ImmutableMap(action.subscription.alerts))
+      .set('alerts', new Immutable.Map(action.subscription.alerts))
       .set('isSubscribed', true);
   case SET_BROWSER_SUPPORT:
     return state.set('browserSupport', action.value);

@@ -1,5 +1,8 @@
 // @ts-check
-(function (allowedPrefixes) {
+
+const allowedPrefixes = (document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT' && document.currentScript.dataset.allowedPrefixes) ? document.currentScript.dataset.allowedPrefixes.split(' ') : [];
+
+(function () {
   'use strict';
 
   /**
@@ -124,4 +127,4 @@
       container.appendChild(iframe);
     });
   });
-})((document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT' && document.currentScript.dataset.allowedPrefixes) ? document.currentScript.dataset.allowedPrefixes.split(' ') : []);
+})();

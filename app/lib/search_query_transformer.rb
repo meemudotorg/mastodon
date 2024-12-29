@@ -144,8 +144,6 @@ class SearchQueryTransformer < Parslet::Transform
   end
 
   class PrefixClause
-    EPOCH_RE = /\A\d+\z/
-
     attr_reader :operator, :prefix, :term
 
     def initialize(prefix, operator, term, options = {})
@@ -170,15 +168,15 @@ class SearchQueryTransformer < Parslet::Transform
       when 'before'
         @filter = :created_at
         @type = :range
-        @term = { lt: date_from_term(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
+        @term = { lt: TermValidator.validate_date!(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
       when 'after'
         @filter = :created_at
         @type = :range
-        @term = { gt: date_from_term(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
+        @term = { gt: TermValidator.validate_date!(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
       when 'during'
         @filter = :created_at
         @type = :range
-        @term = { gte: date_from_term(term), lte: date_from_term(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
+        @term = { gte: TermValidator.validate_date!(term), lte: TermValidator.validate_date!(term), time_zone: @options[:current_account]&.user_time_zone.presence || 'UTC' }
       when 'in'
         @operator = :flag
         @term = term
@@ -224,10 +222,16 @@ class SearchQueryTransformer < Parslet::Transform
 
       term
     end
+  end
 
-    def date_from_term(term)
-      DateTime.iso8601(term) unless term.match?(EPOCH_RE) # This will raise Date::Error if the date is invalid
-      term
+  class TermValidator
+    STRICT_DATE_REGEX = /\A\d{4}-\d{2}-\d{2}\z/ # yyyy-MM-dd
+    EPOCH_MILLIS_REGEX = /\A\d{1,19}\z/
+
+    def self.validate_date!(value)
+      return value if value.match?(STRICT_DATE_REGEX) || value.match?(EPOCH_MILLIS_REGEX)
+
+      raise Mastodon::FilterValidationError, "Invalid date #{value}"
     end
   end
 

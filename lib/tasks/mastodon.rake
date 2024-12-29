@@ -592,11 +592,11 @@ namespace :mastodon do
 end
 
 def disable_log_stdout!
-  dev_null = Logger.new(File::NULL)
+  dev_null = Logger.new('/dev/null')
 
   Rails.logger                 = dev_null
   ActiveRecord::Base.logger    = dev_null
-  HttpLog.configuration.logger = dev_null if defined?(HttpLog)
+  HttpLog.configuration.logger = dev_null
   Paperclip.options[:log]      = false
 end
 

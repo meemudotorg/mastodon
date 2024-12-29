@@ -8,27 +8,17 @@ class TranslationService
   class UnexpectedResponseError < Error; end
 
   def self.configured
-    if configuration.deepl[:api_key].present?
-      TranslationService::DeepL.new(
-        configuration.deepl[:plan],
-        configuration.deepl[:api_key]
-      )
-    elsif configuration.libre_translate[:endpoint].present?
-      TranslationService::LibreTranslate.new(
-        configuration.libre_translate[:endpoint],
-        configuration.libre_translate[:api_key]
-      )
+    if ENV['DEEPL_API_KEY'].present?
+      TranslationService::DeepL.new(ENV.fetch('DEEPL_PLAN', 'free'), ENV['DEEPL_API_KEY'])
+    elsif ENV['LIBRE_TRANSLATE_ENDPOINT'].present?
+      TranslationService::LibreTranslate.new(ENV['LIBRE_TRANSLATE_ENDPOINT'], ENV['LIBRE_TRANSLATE_API_KEY'])
     else
       raise NotConfiguredError
     end
   end
 
   def self.configured?
-    configuration.deepl[:api_key].present? || configuration.libre_translate[:endpoint].present?
-  end
-
-  def self.configuration
-    Rails.configuration.x.translation
+    ENV['DEEPL_API_KEY'].present? || ENV['LIBRE_TRANSLATE_ENDPOINT'].present?
   end
 
   def languages

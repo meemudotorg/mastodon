@@ -55,9 +55,6 @@ RSpec.describe 'Instances' do
             max_characters: StatusLengthValidator::MAX_CHARS,
             max_media_attachments: Status::MEDIA_ATTACHMENTS_LIMIT
           ),
-          media_attachments: include(
-            description_limit: MediaAttachment::MAX_DESCRIPTION_LENGTH
-          ),
           polls: include(
             max_options: PollValidator::MAX_OPTIONS
           )

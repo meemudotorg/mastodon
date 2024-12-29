@@ -7,6 +7,10 @@ RSpec.describe Api::BaseController do
     def success
       head 200
     end
+
+    def failure
+      FakeService.new
+    end
   end
 
   it 'returns private cache control headers by default' do

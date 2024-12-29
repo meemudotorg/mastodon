@@ -9,7 +9,6 @@ import { useAppSelector, useAppDispatch } from 'flavours/glitch/store';
 
 import { NotificationAdminReport } from './notification_admin_report';
 import { NotificationAdminSignUp } from './notification_admin_sign_up';
-import { NotificationAnnualReport } from './notification_annual_report';
 import { NotificationFavourite } from './notification_favourite';
 import { NotificationFollow } from './notification_follow';
 import { NotificationFollowRequest } from './notification_follow_request';
@@ -139,14 +138,6 @@ export const NotificationGroup: React.FC<{
     case 'moderation_warning':
       content = (
         <NotificationModerationWarning
-          unread={unread}
-          notification={notificationGroup}
-        />
-      );
-      break;
-    case 'annual_report':
-      content = (
-        <NotificationAnnualReport
           unread={unread}
           notification={notificationGroup}
         />

@@ -21,7 +21,6 @@ module Admin
       @relay = Relay.new(resource_params)
 
       if @relay.save
-        log_action :create, @relay
         @relay.enable!
         redirect_to admin_relays_path
       else
@@ -32,21 +31,18 @@ module Admin
     def destroy
       authorize :relay, :update?
       @relay.destroy
-      log_action :destroy, @relay
       redirect_to admin_relays_path
     end
 
     def enable
       authorize :relay, :update?
       @relay.enable!
-      log_action :enable, @relay
       redirect_to admin_relays_path
     end
 
     def disable
       authorize :relay, :update?
       @relay.disable!
-      log_action :disable, @relay
       redirect_to admin_relays_path
     end
 

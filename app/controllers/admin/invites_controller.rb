@@ -32,7 +32,7 @@ module Admin
 
     def deactivate_all
       authorize :invite, :deactivate_all?
-      Invite.available.in_batches.touch_all(:expires_at)
+      Invite.available.in_batches.update_all(expires_at: Time.now.utc)
       redirect_to admin_invites_path
     end
 

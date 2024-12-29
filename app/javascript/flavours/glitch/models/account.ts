@@ -1,5 +1,5 @@
 import type { RecordOf } from 'immutable';
-import { List as ImmutableList, Record as ImmutableRecord } from 'immutable';
+import { List, Record as ImmutableRecord } from 'immutable';
 
 import escapeTextContentForBrowser from 'escape-html';
 
@@ -8,11 +8,12 @@ import type {
   ApiAccountRoleJSON,
   ApiAccountJSON,
 } from 'flavours/glitch/api_types/accounts';
+import type { ApiCustomEmojiJSON } from 'flavours/glitch/api_types/custom_emoji';
 import emojify from 'flavours/glitch/features/emoji/emoji';
 import { unescapeHTML } from 'flavours/glitch/utils/html';
 
-import { CustomEmojiFactory, makeEmojiMap } from './custom_emoji';
-import type { CustomEmoji, EmojiMap } from './custom_emoji';
+import { CustomEmojiFactory } from './custom_emoji';
+import type { CustomEmoji } from './custom_emoji';
 
 // AccountField
 interface AccountFieldShape extends Required<ApiAccountFieldJSON> {
@@ -47,9 +48,9 @@ export interface AccountShape
   extends Required<
     Omit<ApiAccountJSON, 'emojis' | 'fields' | 'roles' | 'moved'>
   > {
-  emojis: ImmutableList<CustomEmoji>;
-  fields: ImmutableList<AccountField>;
-  roles: ImmutableList<AccountRole>;
+  emojis: List<CustomEmoji>;
+  fields: List<AccountField>;
+  roles: List<AccountRole>;
   display_name_html: string;
   note_emojified: string;
   note_plain: string | null;
@@ -69,8 +70,8 @@ export const accountDefaultValues: AccountShape = {
   indexable: false,
   display_name: '',
   display_name_html: '',
-  emojis: ImmutableList<CustomEmoji>(),
-  fields: ImmutableList<AccountField>(),
+  emojis: List<CustomEmoji>(),
+  fields: List<AccountField>(),
   group: false,
   header: '',
   header_static: '',
@@ -81,7 +82,7 @@ export const accountDefaultValues: AccountShape = {
   note: '',
   note_emojified: '',
   note_plain: 'string',
-  roles: ImmutableList<AccountRole>(),
+  roles: List<AccountRole>(),
   uri: '',
   url: '',
   username: '',
@@ -100,6 +101,15 @@ export const accountDefaultValues: AccountShape = {
 };
 
 const AccountFactory = ImmutableRecord<AccountShape>(accountDefaultValues);
+
+type EmojiMap = Record<string, ApiCustomEmojiJSON>;
+
+function makeEmojiMap(emojis: ApiCustomEmojiJSON[]) {
+  return emojis.reduce<EmojiMap>((obj, emoji) => {
+    obj[`:${emoji.shortcode}:`] = emoji;
+    return obj;
+  }, {});
+}
 
 function createAccountField(
   jsonField: ApiAccountFieldJSON,
@@ -129,15 +139,11 @@ export function createAccountFromServerJSON(serverJSON: ApiAccountJSON) {
   return AccountFactory({
     ...accountJSON,
     moved: moved?.id,
-    fields: ImmutableList(
+    fields: List(
       serverJSON.fields.map((field) => createAccountField(field, emojiMap)),
     ),
-    emojis: ImmutableList(
-      serverJSON.emojis.map((emoji) => CustomEmojiFactory(emoji)),
-    ),
-    roles: ImmutableList(
-      serverJSON.roles?.map((role) => AccountRoleFactory(role)),
-    ),
+    emojis: List(serverJSON.emojis.map((emoji) => CustomEmojiFactory(emoji))),
+    roles: List(serverJSON.roles?.map((role) => AccountRoleFactory(role))),
     display_name_html: emojify(
       escapeTextContentForBrowser(displayName),
       emojiMap,

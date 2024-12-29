@@ -28,8 +28,8 @@ class Api::V1::FollowRequestsController < Api::BaseController
     @account ||= Account.find(params[:id])
   end
 
-  def relationships(**)
-    AccountRelationshipsPresenter.new([account], current_user.account_id, **)
+  def relationships(**options)
+    AccountRelationshipsPresenter.new([account], current_user.account_id, **options)
   end
 
   def load_accounts

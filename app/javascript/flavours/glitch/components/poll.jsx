@@ -33,17 +33,20 @@ const messages = defineMessages({
   },
 });
 
+const makeEmojiMap = record => record.get('emojis').reduce((obj, emoji) => {
+  obj[`:${emoji.get('shortcode')}:`] = emoji.toJS();
+  return obj;
+}, {});
+
 class Poll extends ImmutablePureComponent {
   static propTypes = {
     identity: identityContextPropShape,
-    poll: ImmutablePropTypes.record.isRequired,
-    status: ImmutablePropTypes.map.isRequired,
+    poll: ImmutablePropTypes.map,
     lang: PropTypes.string,
     intl: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
     refresh: PropTypes.func,
     onVote: PropTypes.func,
-    onInteractionModal: PropTypes.func,
   };
 
   state = {
@@ -114,11 +117,7 @@ class Poll extends ImmutablePureComponent {
       return;
     }
 
-    if (this.props.identity.signedIn) {
-      this.props.onVote(Object.keys(this.state.selected));
-    } else {
-      this.props.onInteractionModal('vote', this.props.status);
-    }
+    this.props.onVote(Object.keys(this.state.selected));
   };
 
   handleRefresh = () => {
@@ -145,7 +144,7 @@ class Poll extends ImmutablePureComponent {
     let titleHtml = option.getIn(['translation', 'titleHtml']) || option.get('titleHtml');
 
     if (!titleHtml) {
-      const emojiMap = emojiMap(poll);
+      const emojiMap = makeEmojiMap(poll);
       titleHtml = emojify(escapeTextContentForBrowser(title), emojiMap);
     }
 
@@ -233,7 +232,7 @@ class Poll extends ImmutablePureComponent {
         </ul>
 
         <div className='poll__footer'>
-          {!showResults && <button className='button button-secondary' disabled={disabled} onClick={this.handleVote}><FormattedMessage id='poll.vote' defaultMessage='Vote' /></button>}
+          {!showResults && <button className='button button-secondary' disabled={disabled || !this.props.identity.signedIn} onClick={this.handleVote}><FormattedMessage id='poll.vote' defaultMessage='Vote' /></button>}
           {!showResults && <><button className='poll__link' onClick={this.handleReveal}><FormattedMessage id='poll.reveal' defaultMessage='See results' /></button> · </>}
           {showResults && !this.props.disabled && <><button className='poll__link' onClick={this.handleRefresh}><FormattedMessage id='poll.refresh' defaultMessage='Refresh' /></button> · </>}
           {votesCount}

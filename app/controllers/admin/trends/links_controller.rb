@@ -4,7 +4,7 @@ class Admin::Trends::LinksController < Admin::BaseController
   def index
     authorize :preview_card, :review?
 
-    @locales       = PreviewCardTrend.locales
+    @locales       = PreviewCardTrend.pluck('distinct language')
     @preview_cards = filtered_preview_cards.page(params[:page])
     @form          = Trends::PreviewCardBatch.new
   end

@@ -15,8 +15,7 @@ import {
   changeColumnParams,
 } from 'mastodon/actions/columns';
 import { fetchDirectory, expandDirectory } from 'mastodon/actions/directory';
-import { Column } from 'mastodon/components/column';
-import type { ColumnRef } from 'mastodon/components/column';
+import Column from 'mastodon/components/column';
 import { ColumnHeader } from 'mastodon/components/column_header';
 import { LoadMore } from 'mastodon/components/load_more';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
@@ -50,7 +49,7 @@ export const Directory: React.FC<{
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
-  const column = useRef<ColumnRef>(null);
+  const column = useRef<Column>(null);
 
   const [orderParam, setOrderParam] = useSearchParam('order');
   const [localParam, setLocalParam] = useSearchParam('local');

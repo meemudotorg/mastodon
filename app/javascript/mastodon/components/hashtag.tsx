@@ -12,7 +12,6 @@ import { Sparklines, SparklinesCurve } from 'react-sparklines';
 
 import { ShortNumber } from 'mastodon/components/short_number';
 import { Skeleton } from 'mastodon/components/skeleton';
-import type { Hashtag as HashtagType } from 'mastodon/models/tags';
 
 interface SilentErrorBoundaryProps {
   children: React.ReactNode;
@@ -78,22 +77,6 @@ export const ImmutableHashtag = ({ hashtag }: ImmutableHashtagProps) => (
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       .map((day) => day.get('uses')!)
       .toArray()}
-  />
-);
-
-export const CompatibilityHashtag: React.FC<{
-  hashtag: HashtagType;
-}> = ({ hashtag }) => (
-  <Hashtag
-    name={hashtag.name}
-    to={`/tags/${hashtag.name}`}
-    people={
-      (hashtag.history[0].accounts as unknown as number) * 1 +
-      ((hashtag.history[1]?.accounts ?? 0) as unknown as number) * 1
-    }
-    history={hashtag.history
-      .map((day) => (day.uses as unknown as number) * 1)
-      .reverse()}
   />
 );
 

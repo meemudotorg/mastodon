@@ -18,8 +18,7 @@ import {
   fetchDirectory,
   expandDirectory,
 } from 'flavours/glitch/actions/directory';
-import { Column } from 'flavours/glitch/components/column';
-import type { ColumnRef } from 'flavours/glitch/components/column';
+import Column from 'flavours/glitch/components/column';
 import { ColumnHeader } from 'flavours/glitch/components/column_header';
 import { LoadMore } from 'flavours/glitch/components/load_more';
 import { LoadingIndicator } from 'flavours/glitch/components/loading_indicator';
@@ -53,7 +52,7 @@ export const Directory: React.FC<{
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
-  const column = useRef<ColumnRef>(null);
+  const column = useRef<Column>(null);
 
   const [orderParam, setOrderParam] = useSearchParam('order');
   const [localParam, setLocalParam] = useSearchParam('local');

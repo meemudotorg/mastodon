@@ -39,10 +39,6 @@ uk:
           attributes:
             data:
               malformed: неправильний
-        list_account:
-          attributes:
-            account_id:
-              taken: вже в списку
         status:
           attributes:
             reblog:

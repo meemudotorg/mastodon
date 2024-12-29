@@ -6,8 +6,6 @@ class Trends::TagFilter
     status
   ).freeze
 
-  IGNORED_PARAMS = %w(page).freeze
-
   attr_reader :params
 
   def initialize(params)
@@ -15,10 +13,14 @@ class Trends::TagFilter
   end
 
   def results
-    scope = initial_scope
+    scope = if params[:status] == 'pending_review'
+              Tag.unscoped.order(id: :desc)
+            else
+              trending_scope
+            end
 
     params.each do |key, value|
-      next if IGNORED_PARAMS.include?(key.to_s)
+      next if key.to_s == 'page'
 
       scope.merge!(scope_for(key, value.to_s.strip)) if value.present?
     end
@@ -28,22 +30,17 @@ class Trends::TagFilter
 
   private
 
-  def initial_scope
-    Tag.select(Tag.arel_table[Arel.star])
-       .joins(:trend)
-       .eager_load(:trend)
-       .reorder(score: :desc)
-  end
-
   def scope_for(key, value)
     case key.to_s
     when 'status'
       status_scope(value)
-    when 'trending'
-      trending_scope(value)
     else
-      raise Mastodon::InvalidParameterError, "Unknown filter: #{key}"
+      raise "Unknown filter: #{key}"
     end
+  end
+
+  def trending_scope
+    Trends.tags.query.to_arel
   end
 
   def status_scope(value)
@@ -55,16 +52,7 @@ class Trends::TagFilter
     when 'pending_review'
       Tag.pending_review
     else
-      raise Mastodon::InvalidParameterError, "Unknown status: #{value}"
-    end
-  end
-
-  def trending_scope(value)
-    case value
-    when 'allowed'
-      TagTrend.allowed
-    else
-      TagTrend.all
+      raise "Unknown status: #{value}"
     end
   end
 end
