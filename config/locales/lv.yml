@@ -453,7 +453,6 @@ lv:
         resolve: Atrisināt domēnu
       not_permitted: Nav atļauta
       resolved_through_html: Atrisināts, izmantojot %{domain}
-      title: Bloķētie e-pasta domēni
     export_domain_allows:
       new:
         title: Importēt domēnu atļaujas

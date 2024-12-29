@@ -65,7 +65,7 @@ ru:
       demote: Разжаловать
       destroyed_msg: Данные %{username} поставлены в очередь на удаление
       disable: Заморозка
-      disable_sign_in_token_auth: Отключить аутентификацию по e-mail кодам
+      disable_sign_in_token_auth: Отключите аутентификацию с помощью маркера электронной почты
       disable_two_factor_authentication: Отключить 2FA
       disabled: Отключено
       display_name: Отображаемое имя
@@ -74,7 +74,7 @@ ru:
       email: E-mail
       email_status: Статус e-mail
       enable: Включить
-      enable_sign_in_token_auth: Включить аутентификацию по e-mail кодам
+      enable_sign_in_token_auth: Включите аутентификацию с помощью маркера электронной почты
       enabled: Включен
       enabled_msg: Учётная запись %{username} успешно разморожена
       followers: Подписчики
@@ -249,25 +249,25 @@ ru:
         assigned_to_self_report_html: "%{name} назначил(а) себя для решения жалобы %{target}"
         change_email_user_html: "%{name} cменил(а) e-mail адрес пользователя %{target}"
         change_role_user_html: "%{name} изменил(а) роль %{target}"
-        confirm_user_html: "%{name} подтвердил(а) e-mail адрес пользователя %{target}"
+        confirm_user_html: "%{name} подтвержденный адрес электронной почты пользователя %{target}"
         create_account_warning_html: "%{name} выдал(а) предупреждение %{target}"
         create_announcement_html: "%{name} создал(а) новое объявление %{target}"
         create_canonical_email_block_html: "%{name} заблокировал(а) e-mail с хешем %{target}"
         create_custom_emoji_html: "%{name} загрузил(а) новый эмодзи %{target}"
         create_domain_allow_html: "%{name} разрешил(а) федерацию с доменом %{target}"
         create_domain_block_html: "%{name} заблокировал(а) домен %{target}"
-        create_email_domain_block_html: "%{name} заблокировал(а) e-mail домен %{target}"
+        create_email_domain_block_html: "%{name} заблокированный почтовый домен %{target}"
         create_ip_block_html: "%{name} создал(а) правило для IP %{target}"
         create_relay_html: "%{name} создал(а) ретранслятор %{target}"
         create_unavailable_domain_html: "%{name} приостановил доставку на узел %{target}"
         create_user_role_html: "%{name} создал(а) роль %{target}"
         demote_user_html: "%{name} разжаловал(а) пользователя %{target}"
         destroy_announcement_html: "%{name} удалил(а) объявление %{target}"
-        destroy_canonical_email_block_html: "%{name} снял(а) блокировку e-mail с хэшем %{target}"
+        destroy_canonical_email_block_html: "%{name} разблокированное письмо с хэшем %{target}"
         destroy_custom_emoji_html: "%{name} удалил(а) эмодзи %{target}"
         destroy_domain_allow_html: "%{name} запретил(а) федерацию с доменом %{target}"
         destroy_domain_block_html: "%{name} снял(а) блокировку с домена %{target}"
-        destroy_email_domain_block_html: "%{name} снял(а) блокировку с e-mail домена %{target}"
+        destroy_email_domain_block_html: "%{name} разблокированный почтовый домен %{target}"
         destroy_instance_html: "%{name} очистил(а) данные для домена %{target}"
         destroy_ip_block_html: "%{name} удалил(а) правило для IP %{target}"
         destroy_relay_html: "%{name} удалил(а) ретранслятор %{target}"

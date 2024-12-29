@@ -176,7 +176,6 @@ bg:
         approve_appeal: Одобряване на обжалването
         approve_user: Одобряване на потребител
         assigned_to_self_report: Назначете доклад
-        change_email_user: Промяна на имейл за потребител
         change_role_user: Промяна на роля за потребител
         confirm_user: Потвърждаване на потребител
         create_account_warning: Създаване на предупреждение
@@ -238,12 +237,9 @@ bg:
         approve_appeal_html: "%{name} одобри обжалването на решение за модериране от %{target}"
         approve_user_html: "%{name} одобри регистрирането от %{target}"
         assigned_to_self_report_html: "%{name} възложи на себе си доклад %{target}"
-        change_email_user_html: "%{name} промени адреса на имейла на потребителя %{target}"
         change_role_user_html: "%{name} промени ролята на %{target}"
-        confirm_user_html: "%{name} потвърди адреса на имейла на потребителя %{target}"
         create_account_warning_html: "%{name} изпрати предупреждение до %{target}"
         create_announcement_html: "%{name} създаде ново оповестяване %{target}"
-        create_canonical_email_block_html: "%{name} блокира имейл с хеш %{target}"
         create_custom_emoji_html: "%{name} качи ново емоджи %{target}"
         create_domain_allow_html: "%{name} позволи федерирането с домейн %{target}"
         create_domain_block_html: "%{name} блокира домейн %{target}"
@@ -253,7 +249,6 @@ bg:
         create_user_role_html: "%{name} създаде роля %{target}"
         demote_user_html: "%{name} понижи потребителя %{target}"
         destroy_announcement_html: "%{name} изтри оповестяване %{target}"
-        destroy_canonical_email_block_html: "%{name} отблокира имейла с хеш %{target}"
         destroy_custom_emoji_html: "%{name} изтри емоджито %{target}"
         destroy_domain_allow_html: "%{name} забрани федерирация с домейн %{target}"
         destroy_domain_block_html: "%{name} отблокира домейн %{target}"
@@ -277,7 +272,6 @@ bg:
         reject_user_html: "%{name} отхвърли регистрирането от %{target}"
         remove_avatar_user_html: "%{name} премахна аватара на %{target}"
         reopen_report_html: "%{name} отвори пак доклада на %{target}"
-        resend_user_html: "%{name} изпрати пак е-писмо за потвърждение за %{target}"
         reset_password_user_html: "%{name} нулира паролата на потребител %{target}"
         resolve_report_html: "%{name} разреши случая с доклада от %{target}"
         sensitive_account_html: "%{name} означи мултимедия на %{target} като деликатна"
@@ -438,7 +432,6 @@ bg:
       attempts_over_week:
         one: "%{count} опит за изминалата седмица"
         other: "%{count} опита за регистрация през изминалата седмица"
-      created_msg: Успешно блокиран домейн на е-поща
       delete: Изтриване
       dns:
         types:
@@ -452,7 +445,6 @@ bg:
       not_permitted: Няма позволение
       resolved_dns_records_hint_html: Името на домейна се разрешава в следните MX домейни, които в крайна сметка са отговорни за приемането на е-писма. Блокирането на MX домейн блокира регистрациите от всеки имейл, използващ същия MX домейн, дори видимото име на домейна да е различно. <strong>Внимавайте и не блокирайте главните доставчици на е-поща.</strong>
       resolved_through_html: Преобразувано чрез %{domain}
-      title: Блокирани домейни на имейл
     export_domain_allows:
       new:
         title: Внасяне на позволенията на домейни
@@ -672,7 +664,6 @@ bg:
         delete_data_html: Изтриване на профила и съдържанието на <strong>@%{acct}</strong> за 30 дни от сега, освен ако междувременно не получи спиране
         preview_preamble_html: "<strong>@%{acct}</strong> ще получи предупреждение със следното съдържание:"
         record_strike_html: Запис на предупреждение против <strong>@%{acct}</strong>, за да ви помогне при изострянето на бъдещи нарушения от този акаунт
-        send_email_html: Изпращане на предупредително е-писмо на <strong>@%{acct}</strong>
         warning_placeholder: Незадължителни допълнителни причини за модераторско действие.
       target_origin: Произход на докладвания акаунт
       title: Доклади
@@ -712,7 +703,6 @@ bg:
         manage_appeals: Управление на жалбите
         manage_appeals_description: Позволява на потребителите да разглеждат обжалвания срещу модераторски действия
         manage_blocks: Управляване на блокиранията
-        manage_blocks_description: Позволява на потребителите да блокират доставчици на е-поща и IP адреси
         manage_custom_emojis: Управляване на персонализирани емоджита
         manage_custom_emojis_description: Позволява на потребителите да управляват персонализирани емоджита в сървъра
         manage_federation: Управление на Федерацията
@@ -1107,7 +1097,6 @@ bg:
   application_mailer:
     notification_preferences: Промяна на предпочитанията за е-поща
     salutation: "%{name},"
-    settings: 'Промяна на предпочитанията за имейл: %{link}'
     unsubscribe: Стоп на абонамента
     view: 'Преглед:'
     view_profile: Преглед на профила
@@ -1155,7 +1144,6 @@ bg:
     migrate_account_html: Ако желаете да пренасочите този акаунт към друг, можете да <a href="%{path}">настроите това тук</a>.
     or_log_in_with: Или влизане с помощта на
     progress:
-      confirm: Потвърждаване на имейл
       details: Вашите подробности
       review: Нашият преглед
       rules: Приемане на правилата
@@ -2010,7 +1998,6 @@ bg:
     invalid_otp_token: Невалиден код
     otp_lost_help_html: Ако загубите достъп до двете, то може да се свържете с %{email}
     rate_limited: Премного опити за удостоверяване. Опитайте пак по-късно.
-    seamless_external_login: Влезли сте чрез външна услуга, така че настройките за парола и имейл не са налични.
     signed_in_as: 'Влезли като:'
   verification:
     extra_instructions_html: <strong>Съвет:</strong>Връзката в уебсайта ви може да е невидима. Важна част е <code>rel="me"</code>, която предотврятява имитирането на уебсайтове с породено от потребителите съдържание. Може дори да употребите етикет за <code>връзката</code> в заглавката на странице вместо <code>а</code>, но HTML трябва да достъпен без изпълнение на JavaScript.

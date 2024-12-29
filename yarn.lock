@@ -2449,6 +2449,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@formatjs/ts-transformer@npm:3.13.16":
+  version: 3.13.16
+  resolution: "@formatjs/ts-transformer@npm:3.13.16"
+  dependencies:
+    "@formatjs/icu-messageformat-parser": "npm:2.7.10"
+    "@types/json-stable-stringify": "npm:^1.0.32"
+    "@types/node": "npm:14 || 16 || 17 || 18"
+    chalk: "npm:^4.0.0"
+    json-stable-stringify: "npm:^1.0.1"
+    tslib: "npm:^2.7.0"
+    typescript: "npm:5"
+  peerDependencies:
+    ts-jest: ">=27"
+  peerDependenciesMeta:
+    ts-jest:
+      optional: true
+  checksum: 10c0/de03e8bc8c730f2e122970d5843762e0c5183181ba58c9759db2f1ed45fcbfbb8046dbb3318f906574f89026481b9205f5bd6fbf3f410a5e5e1754f575baa489
+  languageName: node
+  linkType: hard
+
 "@gamestdio/websocket@npm:^0.3.2":
   version: 0.3.2
   resolution: "@gamestdio/websocket@npm:0.3.2"
@@ -3973,6 +3993,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.19.8"
   checksum: 10c0/d3a11f2549234a91a4c5d0ff35ab4bdcb7ba34db4d3f1d189be39b8bd41c19aac98d117150a95a9c5a9d45b1014135477ea240b2b8317c86ae3d3cf1c3b3f8f4
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:14 || 16 || 17 || 18":
+  version: 18.19.55
+  resolution: "@types/node@npm:18.19.55"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/19ffeca0086b45cba08d4585623cd0d80fbacb659debde82a4baa008fc0c25ba6c21cd721f3a9f0be74f70940694b00458cac61c89f8b2a1e55ca4322a9aad2b
   languageName: node
   linkType: hard
 
@@ -8251,6 +8280,17 @@ __metadata:
   bin:
     eslint: bin/eslint.js
   checksum: 10c0/1fd31533086c1b72f86770a4d9d7058ee8b4643fd1cfd10c7aac1ecb8725698e88352a87805cf4b2ce890aa35947df4b4da9655fb7fdfa60dbb448a43f6ebcf1
+  languageName: node
+  linkType: hard
+
+"espree@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "espree@npm:10.1.0"
+  dependencies:
+    acorn: "npm:^8.12.0"
+    acorn-jsx: "npm:^5.3.2"
+    eslint-visitor-keys: "npm:^4.0.0"
+  checksum: 10c0/52e6feaa77a31a6038f0c0e3fce93010a4625701925b0715cd54a2ae190b3275053a0717db698697b32653788ac04845e489d6773b508d6c2e8752f3c57470a0
   languageName: node
   linkType: hard
 

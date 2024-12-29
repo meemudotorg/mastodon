@@ -246,7 +246,6 @@ eo:
         confirm_user_html: "%{name} konfirmis retadreson de uzanto %{target}"
         create_account_warning_html: "%{name} sendis averton al %{target}"
         create_announcement_html: "%{name} kreis novan anoncon %{target}"
-        create_canonical_email_block_html: "%{name} blokis retpoŝtadreson per krado %{target}"
         create_custom_emoji_html: "%{name} alŝutis novan emoĝion %{target}"
         create_domain_allow_html: "%{name} aldonis domajnon %{target} al la blanka listo"
         create_domain_block_html: "%{name} blokis domajnon %{target}"
@@ -257,7 +256,6 @@ eo:
         create_user_role_html: "%{name} kreis rolon de %{target}"
         demote_user_html: "%{name} degradis uzanton %{target}"
         destroy_announcement_html: "%{name} forigis anoncon %{target}"
-        destroy_canonical_email_block_html: "%{name} malblokis retpoŝtadreson per krado %{target}"
         destroy_custom_emoji_html: "%{name} forigis emoĝion %{target}"
         destroy_domain_allow_html: "%{name} forigis domajnon %{target} el la blanka listo"
         destroy_domain_block_html: "%{name} malblokis domajnon %{target}"
@@ -284,7 +282,6 @@ eo:
         reject_user_html: "%{name} malakceptis registriĝon de %{target}"
         remove_avatar_user_html: "%{name} forigis la profilbildon de %{target}"
         reopen_report_html: "%{name} remalfermis signalon %{target}"
-        resend_user_html: "%{name} resendis konfirman retmesaĝon por %{target}"
         reset_password_user_html: "%{name} restarigis la pasvorton de la uzanto %{target}"
         resolve_report_html: "%{name} solvis raporton %{target}"
         sensitive_account_html: "%{name} markis audovidaĵon de %{target} kiel tiklan"
@@ -1502,7 +1499,6 @@ eo:
     authentication_methods:
       otp: 2-faktora autentigprogramaro
       password: pasvorto
-      sign_in_token: retpoŝta sekureca kodo
       webauthn: sekurecaj ŝlosiloj
     description_html: Se vi vidas nerekonitan agon, eble ŝanĝu vian pasvorton.
     empty: Neniu autentighistorio disponebla

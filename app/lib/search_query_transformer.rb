@@ -231,6 +231,17 @@ class SearchQueryTransformer < Parslet::Transform
     end
   end
 
+  class TermValidator
+    STRICT_DATE_REGEX = /\A\d{4}-\d{2}-\d{2}\z/ # yyyy-MM-dd
+    EPOCH_MILLIS_REGEX = /\A\d{1,19}\z/
+
+    def self.validate_date!(value)
+      return value if value.match?(STRICT_DATE_REGEX) || value.match?(EPOCH_MILLIS_REGEX)
+
+      raise Mastodon::FilterValidationError, "Invalid date #{value}"
+    end
+  end
+
   rule(clause: subtree(:clause)) do
     prefix   = clause[:prefix][:term].to_s.downcase if clause[:prefix]
     operator = clause[:operator]&.to_s

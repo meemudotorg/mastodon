@@ -127,6 +127,30 @@ class Notification < ApplicationRecord
     end
   end
 
+  def set_group_key!
+    return if filtered? || Notification::GROUPABLE_NOTIFICATION_TYPES.exclude?(type)
+
+    type_prefix = case type
+                  when :favourite, :reblog
+                    [type, target_status&.id].join('-')
+                  when :follow
+                    type
+                  else
+                    raise NotImplementedError
+                  end
+    redis_key   = "notif-group/#{account.id}/#{type_prefix}"
+    hour_bucket = activity.created_at.utc.to_i / 1.hour.to_i
+
+    # Reuse previous group if it does not span too large an amount of time
+    previous_bucket = redis.get(redis_key).to_i
+    hour_bucket = previous_bucket if hour_bucket < previous_bucket + MAXIMUM_GROUP_SPAN_HOURS
+
+    # We do not concern ourselves with race conditions since we use hour buckets
+    redis.set(redis_key, hour_bucket, ex: MAXIMUM_GROUP_SPAN_HOURS.hours.to_i)
+
+    self.group_key = "#{type_prefix}-#{hour_bucket}"
+  end
+
   class << self
     def browserable(types: [], exclude_types: [], from_account_id: nil, include_filtered: false)
       requested_types = if types.empty?
