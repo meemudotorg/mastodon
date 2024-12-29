@@ -2365,9 +2365,9 @@ __metadata:
     intl-messageformat: "npm:10.7.0"
     tslib: "npm:^2.7.0"
   peerDependencies:
-    ts-jest: ">=27"
+    typescript: ^4.7 || 5
   peerDependenciesMeta:
-    ts-jest:
+    typescript:
       optional: true
   checksum: 10c0/e35a4421f445ef4f7ce362144dde143ad895391b03380fbf896fe261a445fa6b5d886989e07bf9b49e52e83f0a3f9b667cfecbc2684a9ea898c6d25daf07b392
   languageName: node

@@ -9,12 +9,6 @@ module ProfileStories
     click_on I18n.t('auth.login')
   end
 
-  def fill_in_auth_details(email, password)
-    fill_in 'user_email', with: email
-    fill_in 'user_password', with: password
-    click_on I18n.t('auth.login')
-  end
-
   def as_a_registered_user
     @bob = Fabricate(
       :user,

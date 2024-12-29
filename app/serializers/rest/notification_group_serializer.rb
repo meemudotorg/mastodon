@@ -22,14 +22,6 @@ class REST::NotificationGroupSerializer < ActiveModel::Serializer
     object.target_status&.id&.to_s
   end
 
-  def sample_account_ids
-    object.sample_accounts.pluck(:id).map(&:to_s)
-  end
-
-  def status_id
-    object.target_status&.id&.to_s
-  end
-
   def status_type?
     [:favourite, :reblog, :status, :mention, :poll, :update].include?(object.type)
   end
