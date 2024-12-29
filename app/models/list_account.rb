@@ -41,4 +41,8 @@ class ListAccount < ApplicationRecord
   def list_owner_account_is_account?
     list.account_id == account_id
   end
+
+  def list_owner_account_is_account?
+    list.account_id == account_id
+  end
 end

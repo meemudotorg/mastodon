@@ -11,6 +11,13 @@ module StatusesHelper
     direct: 'alternate_email',
   }.freeze
 
+  VISIBLITY_ICONS = {
+    public: 'globe',
+    unlisted: 'lock_open',
+    private: 'lock',
+    direct: 'alternate_email',
+  }.freeze
+
   def nothing_here(extra_classes = '')
     tag.div(class: ['nothing-here', extra_classes]) do
       t('accounts.nothing_here')
