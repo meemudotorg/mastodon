@@ -1831,6 +1831,7 @@ en:
     default: Mastodon (Dark)
     mastodon-light: Mastodon (Light)
     system: Automatic (use system theme)
+    meemu: Meemu Purple
   time:
     formats:
       default: "%b %d, %Y, %H:%M"
