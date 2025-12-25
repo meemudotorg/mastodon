@@ -1,0 +1,189 @@
+@use '@/styles/common';
+
+html {
+  /* ===================================
+     OCEAN BLUE THEME
+     A deep ocean-inspired theme with
+     turquoise accents and coral highlights
+     =================================== */
+
+  /* =====================================
+     BASE PALETTE OVERRIDES
+     ===================================== */
+
+  /* Ocean Grays - Blue-tinted neutrals */
+  --color-grey-950: #0a1929;
+  --color-grey-900: #0f2839;
+  --color-grey-850: #14354a;
+  --color-grey-800: #19425b;
+  --color-grey-750: #1e506c;
+  --color-grey-700: #235e7d;
+  --color-grey-600: #2e7a9f;
+  --color-grey-500: #4a95b8;
+  --color-grey-400: #6dadc9;
+  --color-grey-300: #91c5db;
+  --color-grey-200: #b5ddec;
+  --color-grey-100: #d9f0f8;
+  --color-grey-50: #ecf7fb;
+
+  /* Ocean Brand Colors - Turquoise */
+  --color-indigo-600: #0d9488;
+  --color-indigo-500: #14b8a6;
+  --color-indigo-400: #2dd4bf;
+  --color-indigo-300: #5eead4;
+  --color-indigo-200: #99f6e4;
+  --color-indigo-100: #ccfbf1;
+  --color-indigo-50: #f0fdfa;
+
+  /* Status Colors - Ocean themed */
+  --color-red-600: #dc2626;
+  --color-red-500: #ef4444;
+  --color-yellow-700: #b45309;
+  --color-yellow-600: #d97706;
+  --color-yellow-400: #fbbf24;
+  --color-green-600: #059669;
+  --color-green-400: #34d399;
+
+  /* =====================================
+     SEMANTIC TOKENS - DARK THEME
+     ===================================== */
+
+  /* TEXT TOKENS */
+  --color-text-primary: #e0f2f7;
+  --color-text-secondary: #94c5d9;
+  --color-text-tertiary: #6397b3;
+  --color-text-brand: #5eead4;
+  --color-text-error: #fca5a5;
+  --color-text-warning: #fcd34d;
+  --color-text-success: #6ee7b7;
+  --color-text-disabled: #4a6b7d;
+  --color-text-on-brand-base: #042f2e;
+  --color-text-on-error-base: #450a0a;
+  --color-text-on-warning-base: #451a03;
+  --color-text-on-success-base: #064e3b;
+  --color-text-on-inverted-base: #0a1929;
+  --color-text-on-media: #fff;
+  --color-text-placeholder: #5d8aa3;
+
+  /* BACKGROUND TOKENS */
+  --color-bg-primary: #0a1929;
+  --color-bg-secondary: #0f2839;
+  --color-bg-tertiary: #14354a;
+  --color-bg-brand-base: #0d9488;
+  --color-bg-brand-base-hover: #0f766e;
+  --color-bg-brand-base-active: #115e59;
+  --color-bg-brand-soft: #134e4a;
+  --color-bg-brand-softer: #0a2e29;
+  --color-bg-error-base: #dc2626;
+  --color-bg-error-soft: #450a0a;
+  --color-bg-error-softer: #1a0a0a;
+  --color-bg-warning-base: #d97706;
+  --color-bg-warning-soft: #451a03;
+  --color-bg-warning-softer: #1a0f05;
+  --color-bg-success-base: #059669;
+  --color-bg-success-soft: #064e3b;
+  --color-bg-success-softer: #051f1a;
+  --color-bg-overlay: rgba(10, 25, 41, 90%);
+  --color-bg-media: #0a1929;
+  --color-bg-disabled: #19425b;
+  --color-bg-inverted-primary: #e0f2f7;
+  --color-bg-inverted-secondary: #b5ddec;
+
+  /* BORDER TOKENS */
+  --color-border-primary: #2e7a9f;
+  --color-border-media: #235e7d;
+  --color-border-on-secondary: #4a95b8;
+  --color-border-on-brand: #5eead4;
+  --color-border-on-error: #fca5a5;
+  --color-border-on-warning: #fcd34d;
+  --color-border-on-success: #6ee7b7;
+  --color-border-on-inverted: #6dadc9;
+
+  /* SHADOW TOKENS */
+  --color-shadow-dropdown: rgba(0, 0, 0, 40%);
+  --color-shadow-overlay-icon: rgba(10, 25, 41, 70%);
+
+  /* GRAPH/CHART TOKENS */
+  --color-graph-stroke-primary: #14b8a6;
+  --color-graph-stroke-warning: #fbbf24;
+  --color-graph-stroke-disabled: #4a6b7d;
+  --color-graph-fill-primary: rgba(20, 184, 166, 20%);
+  --color-graph-fill-warning: rgba(251, 191, 36, 20%);
+  --color-graph-fill-disabled: rgba(74, 107, 125, 20%);
+
+  /* =====================================
+     ADDITIONAL CUSTOMIZATIONS
+     ===================================== */
+
+  --focus-ring-color: #5eead4;
+  --focus-ring-width: 2px;
+
+  /* Scrollbar theming */
+  scrollbar-color: var(--color-indigo-500) var(--color-bg-secondary);
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-indigo-500);
+    border-radius: 4px;
+
+    &:hover {
+      background-color: var(--color-indigo-400);
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-bg-secondary);
+  }
+}
+
+/* =====================================
+   COMPONENT-SPECIFIC ENHANCEMENTS
+   ===================================== */
+
+*:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.button {
+  transition: all 0.2s ease-in-out;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 30%);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.card,
+.status__wrapper,
+.detailed-status,
+.account__header {
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 10%);
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 15%);
+  }
+}
+
+.navigation-panel,
+.compose-panel {
+  background: linear-gradient(
+    180deg,
+    var(--color-bg-primary) 0%,
+    color-mix(in srgb, var(--color-bg-primary) 95%, var(--color-indigo-600) 5%)
+      100%
+  );
+}
+
+.loading-indicator {
+  color: var(--color-indigo-400);
+}
+
+.loading-bar {
+  background-color: var(--color-indigo-500);
+}
+
+// color-scheme: dark;
