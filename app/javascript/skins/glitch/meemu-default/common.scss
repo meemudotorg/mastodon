@@ -1,7 +1,7 @@
 @use '../../../styles/application';
 
 /* Main/base background: CR 15.55 (AAA) against white text */
-$classic-base-color: #261f3f;
+$classic-base-color: #320078;
 $ui-base-color: $classic-base-color;
 
 /* Left panel background:
@@ -48,6 +48,25 @@ $ui-base-color: $classic-base-color;
 	background: #2a2342;
 }
 */
+
+body {
+  font-family: mastodon-font-sans-serif, sans-serif;
+  background: #320078;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  text-rendering: optimizelegibility;
+}
+
+// Dark theme colors
+.theme-dark,
+html:where(
+  :not([data-user-theme='mastodon-light'], [data-user-theme='system'])) {
+  color-scheme: dark;
+
+  --color-bg-primary: #1c0240;
+}
 
 /* Highlight text: CR 9.0 (AAA) against base,
  * CR 6.85 (AA) against account view
