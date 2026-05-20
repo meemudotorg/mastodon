@@ -13,7 +13,7 @@ module Mastodon
     end
 
     def patch
-      2
+      10
     end
 
     def default_prerelease
@@ -46,6 +46,7 @@ module Mastodon
     def api_versions
       {
         mastodon: 7,
+        glitch: 1,
       }
     end
 
