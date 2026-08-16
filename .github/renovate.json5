@@ -15,6 +15,13 @@
   // to `null` after any other rule set it to something.
   dependencyDashboardHeader: 'This issue lists Renovate updates and detected dependencies. Read the [Dependency Dashboard](https://docs.renovatebot.com/key-concepts/dashboard/) docs to learn more. Before approving any upgrade: read the description and comments in the [`renovate.json5` file](https://github.com/mastodon/mastodon/blob/main/.github/renovate.json5).',
   postUpdateOptions: ['yarnDedupeHighest'],
+  devcontainer: {
+    managerFilePatterns: [
+      '/^\.devcontainer\/devcontainer\.json$/',
+      '/^\.devcontainer\.json$/',
+      '/^\.devcontainer\/devcontainer-lock\.json$/',
+    ],
+  },
   // The types are now included in recent versions,we ignore them here until we upgrade and remove the dependency
   ignoreDeps: ['@types/emoji-mart'],
   packageRules: [
@@ -25,9 +32,6 @@
         // react-router: Requires manual upgrade
         'history',
         'react-router-dom',
-
-        // react-spring: Requires manual upgrade when upgrading react
-        '@react-spring/web',
       ],
       matchUpdateTypes: ['major'],
       dependencyDashboardApproval: true,
@@ -113,6 +117,7 @@
       ],
       matchUpdateTypes: ['major'],
       groupName: 'artifact actions (major)',
+      extends: ['helpers:pinGitHubActionDigests'],
     },
     {
       // Update @types/* packages every week, with one grouped PR
@@ -153,9 +158,15 @@
       groupName: 'opentelemetry-ruby (non-major)',
     },
     {
-      // Group Playwright Ruby & JS deps in the same PR, as they need to be in sync
-      matchManagers: ['bundler', 'npm'],
-      matchPackageNames: ['playwright-ruby-client', 'playwright'],
+      // The ruby portion of the Playwright group
+      matchManagers: ['bundler'],
+      matchPackageNames: ['playwright-ruby-client'],
+      groupName: 'Playwright',
+    },
+    {
+      // The node portion of the Playwright group
+      matchManagers: ['npm'],
+      matchPackageNames: ['playwright'],
       groupName: 'Playwright',
     },
     // Add labels depending on package manager
