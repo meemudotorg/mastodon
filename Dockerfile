@@ -13,7 +13,7 @@ ARG BASE_REGISTRY="docker.io"
 
 # Ruby image to use for base image, change with [--build-arg RUBY_VERSION="3.4.x"]
 # renovate: datasource=docker depName=docker.io/ruby
-ARG RUBY_VERSION="3.4.7"
+ARG RUBY_VERSION="3.4.12"
 # # Node.js version to use in base image, change with [--build-arg NODE_MAJOR_VERSION="22"]
 # renovate: datasource=node-version depName=node
 ARG NODE_MAJOR_VERSION="24"
@@ -205,8 +205,8 @@ RUN \
 FROM build AS ffmpeg
 
 # ffmpeg version to compile, change with [--build-arg FFMPEG_VERSION="7.0.x"]
-# renovate: datasource=repology depName=ffmpeg packageName=openpkg_current/ffmpeg
-ARG FFMPEG_VERSION=8.0
+# renovate: datasource=github-tags depName=FFmpeg/FFmpeg extractVersion=^n(?<version>\d+\.\d+(\.\d+)?)$
+ARG FFMPEG_VERSION=8.1.2
 # ffmpeg download URL, change with [--build-arg FFMPEG_URL="https://ffmpeg.org/releases"]
 ARG FFMPEG_URL=https://github.com/FFmpeg/FFmpeg/archive/refs/tags
 
@@ -384,7 +384,7 @@ RUN \
 
 RUN \
   # Precompile bootsnap code for faster Rails startup
-  bundle exec bootsnap precompile --gemfile app/ lib/;
+  bundle exec bootsnap precompile --gemfile app/ lib/ config/;
 
 RUN \
   # Pre-create and chown system volume to Mastodon user
